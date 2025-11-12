@@ -29,102 +29,95 @@
 <script>
 const panel = document.getElementById('panel-niveles');
 
-// Función para extraer ID de YouTube de cualquier URL válida
+// Función para obtener el ID del video de cualquier URL de YouTube
 function getYouTubeID(url) {
-    let videoId = '';
-    try {
-        const u = new URL(url);
-        if (u.hostname.includes('youtu.be')) {
-            videoId = u.pathname.slice(1); // elimina la /
-        } else if (u.hostname.includes('youtube.com')) {
-            videoId = u.searchParams.get('v');
-        }
-        // Asegurar que tenga solo 11 caracteres
-        if (videoId && videoId.length > 11) videoId = videoId.slice(0,11);
-    } catch(e) {
-        console.warn('URL inválida:', url);
-    }
-    return videoId;
+    let match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&\?]+)/);
+    return match ? match[1] : null;
 }
 
-// Cargar CSV desde la misma carpeta
+// Cargar CSV desde la carpeta
 fetch('niveles.csv')
-.then(response => {
-    if (!response.ok) throw new Error('No se pudo cargar el CSV');
-    return response.text();
-})
-.then(csv => {
-    const lines = csv.trim().split('\n');
-    const headers = lines.shift().split(';'); // delimitador ';'
+    .then(response => {
+        if (!response.ok) throw new Error('No se pudo cargar el CSV');
+        return response.text();
+    })
+    .then(csv => {
+        const lines = csv.trim().split('\n');
+        const headers = lines.shift().split(';'); // Delimitador ';'
 
-    const niveles = lines.map(line => {
-        const cols = line.split(';');
-        return {
-            url: cols[0],
-            titulo: cols[1],
-            stats: {
-                Creador: cols[2],
-                Ranchopoints: cols[3]
+        const niveles = lines.map(line => {
+            const cols = line.split(';');
+            return {
+                url: cols[0],
+                titulo: cols[1],
+                stats: {
+                    Creador: cols[2],
+                    Ranchopoints: cols[3]
+                }
+            };
+        });
+
+        niveles.forEach(nivel => {
+            const videoId = getYouTubeID(nivel.url);
+
+            const nivelDiv = document.createElement('div');
+            nivelDiv.classList.add('nivel');
+            nivelDiv.style.display = 'flex';
+            nivelDiv.style.alignItems = 'center';
+            nivelDiv.style.margin = '10px 0';
+            nivelDiv.style.background = 'white';
+            nivelDiv.style.padding = '15px';
+            nivelDiv.style.borderRadius = '10px';
+
+            // Miniatura (16:9 exacta, sin franjas)
+            const thumb = document.createElement('a');
+            thumb.href = nivel.url;
+            thumb.target = "_blank";
+            thumb.style.display = 'block';
+            thumb.style.width = '200px';
+            thumb.style.height = `${200 * 9 / 16}px`; // 16:9 exacto
+            thumb.style.borderRadius = '10px';
+            thumb.style.flexShrink = "0";
+
+            if (videoId) {
+                thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/maxresdefault.jpg')`;
+                thumb.style.backgroundSize = '100% 100%';
+                thumb.style.backgroundPosition = 'center';
+                thumb.style.backgroundRepeat = 'no-repeat';
+            } else {
+                thumb.style.backgroundColor = '#000'; // fallback si no hay ID
             }
-        };
+
+            // Info del nivel
+            const infoDiv = document.createElement('div');
+            infoDiv.style.display = 'flex';
+            infoDiv.style.flexDirection = 'column';
+            infoDiv.style.marginLeft = '20px';
+
+            const titulo = document.createElement('h2');
+            const linkTitulo = document.createElement('a');
+            linkTitulo.href = nivel.url;
+            linkTitulo.target = "_blank";
+            linkTitulo.textContent = nivel.titulo;
+            linkTitulo.style.fontSize = '1.5em'; // más grande
+            titulo.appendChild(linkTitulo);
+
+            const stats = document.createElement('p');
+            stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+
+            infoDiv.appendChild(titulo);
+            infoDiv.appendChild(stats);
+
+            nivelDiv.appendChild(thumb);
+            nivelDiv.appendChild(infoDiv);
+
+            panel.appendChild(nivelDiv);
+        });
+    })
+    .catch(err => {
+        console.error("Error cargando CSV:", err);
+        panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
     });
-
-    niveles.forEach(nivel => {
-        const videoId = getYouTubeID(nivel.url);
-
-        const nivelDiv = document.createElement('div');
-        nivelDiv.classList.add('nivel');
-        nivelDiv.style.display = 'flex';
-        nivelDiv.style.alignItems = 'center';
-        nivelDiv.style.margin = '15px 0';
-        nivelDiv.style.background = 'white';
-        nivelDiv.style.padding = '15px';
-        nivelDiv.style.borderRadius = '10px';
-        nivelDiv.style.boxSizing = 'border-box';
-
-        // Miniatura (YouTube)
-        const thumb = document.createElement('a');
-        thumb.href = nivel.url;
-        thumb.target = "_blank";
-        thumb.style.width = '200px';
-        thumb.style.height = '115px'; // proporción 16:9
-        thumb.style.borderRadius = '10px';
-        thumb.style.flexShrink = "0";
-        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
-        thumb.style.backgroundSize = 'cover';
-        thumb.style.backgroundPosition = 'center';
-
-        // Info del nivel
-        const infoDiv = document.createElement('div');
-        infoDiv.style.display = 'flex';
-        infoDiv.style.flexDirection = 'column';
-        infoDiv.style.marginLeft = '20px';
-
-        const titulo = document.createElement('h2');
-        const linkTitulo = document.createElement('a');
-        linkTitulo.href = nivel.url;
-        linkTitulo.target = "_blank";
-        linkTitulo.textContent = nivel.titulo;
-        linkTitulo.style.fontSize = '1.5em'; // nombre más grande
-        titulo.appendChild(linkTitulo);
-
-        const stats = document.createElement('p');
-        stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
-
-        infoDiv.appendChild(titulo);
-        infoDiv.appendChild(stats);
-
-        nivelDiv.appendChild(thumb);
-        nivelDiv.appendChild(infoDiv);
-
-        panel.appendChild(nivelDiv);
-    });
-})
-.catch(err => {
-    console.error("Error cargando CSV:", err);
-    panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
-});
 </script>
-
 </body>
 </html>
