@@ -26,83 +26,89 @@
     </div>
   </div>
 
-  <script>
-    const panel = document.getElementById('panel-niveles');
+<script>
+  const panel = document.getElementById('panel-niveles');
 
-    // Cargar CSV desde la carpeta
-    fetch('niveles.csv')
-      .then(response => {
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
-        return response.text();
-      })
-      .then(csv => {
-        const lines = csv.trim().split('\n');
-        const headers = lines.shift().split(';'); // Delimitador ';'
+  // Cargar CSV desde la carpeta
+  fetch('niveles.csv')
+    .then(response => {
+      if (!response.ok) throw new Error('No se pudo cargar el CSV');
+      return response.text();
+    })
+    .then(csv => {
+      const lines = csv.trim().split('\n');
+      const headers = lines.shift().split(';'); // Delimitador ';'
 
-        const niveles = lines.map(line => {
-          const cols = line.split(';');
-          return {
-            miniatura: cols[0],
-            url: cols[1],
-            titulo: cols[2],
-            stats: {
-              Creador: cols[3],
-              Ranchopoints: cols[4]
-            }
-          };
-        });
-
-        niveles.forEach(nivel => {
-          const nivelDiv = document.createElement('div');
-          nivelDiv.classList.add('nivel');
-          nivelDiv.style.display = 'flex';
-          nivelDiv.style.alignItems = 'center';
-          nivelDiv.style.margin = '10px 0';
-          nivelDiv.style.background = 'white';
-          nivelDiv.style.padding = '15px';
-          nivelDiv.style.borderRadius = '10px';
-
-          // Miniatura
-          const thumb = document.createElement('a');
-          thumb.href = nivel.url;
-          thumb.target = "_blank";
-          thumb.classList.add('thumb');
-          thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
-          thumb.style.width = '200px';
-          thumb.style.height = '116px';
-          thumb.style.borderRadius = '10px';
-          thumb.style.flexShrink = "0";
-
-          // Info del nivel
-          const infoDiv = document.createElement('div');
-          infoDiv.style.display = 'flex';
-          infoDiv.style.flexDirection = 'column';
-          infoDiv.style.marginLeft = '20px';
-
-          const titulo = document.createElement('h2');
-          const linkTitulo = document.createElement('a');
-          linkTitulo.href = nivel.url;
-          linkTitulo.target = "_blank";
-          linkTitulo.textContent = nivel.titulo;
-          linkTitulo.style.fontSize = '1.1em'; // más grande
-          titulo.appendChild(linkTitulo);
-
-          const stats = document.createElement('p');
-          stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
-
-          infoDiv.appendChild(titulo);
-          infoDiv.appendChild(stats);
-
-          nivelDiv.appendChild(thumb);
-          nivelDiv.appendChild(infoDiv);
-
-          panel.appendChild(nivelDiv);
-        });
-      })
-      .catch(err => {
-        console.error("Error cargando CSV:", err);
-        panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
+      const niveles = lines.map(line => {
+        const cols = line.split(';');
+        return {
+          url: cols[0],       // la primera columna será la URL del video
+          titulo: cols[1],    // título
+          creador: cols[2],
+          puntos: cols[3]
+        };
       });
-  </script>
+
+      niveles.forEach(nivel => {
+        const nivelDiv = document.createElement('div');
+        nivelDiv.classList.add('nivel');
+        nivelDiv.style.display = 'flex';
+        nivelDiv.style.alignItems = 'center';
+        nivelDiv.style.margin = '20px 0';
+        nivelDiv.style.background = 'white';
+        nivelDiv.style.padding = '15px';
+        nivelDiv.style.borderRadius = '10px';
+
+        // 🔍 Extraer el ID del video (de youtu.be o youtube.com/watch?v=)
+        let videoId = "";
+        const match = nivel.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        if (match) videoId = match[1];
+
+        // Miniatura generada automáticamente
+        const thumb = document.createElement('a');
+        thumb.href = nivel.url;
+        thumb.target = "_blank";
+        thumb.classList.add('thumb');
+        thumb.style.width = '200px';
+        thumb.style.height = '116px';
+        thumb.style.borderRadius = '10px';
+        thumb.style.flexShrink = "0";
+        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+
+        // Información del nivel
+        const infoDiv = document.createElement('div');
+        infoDiv.style.display = 'flex';
+        infoDiv.style.flexDirection = 'column';
+        infoDiv.style.marginLeft = '20px';
+        infoDiv.style.textAlign = 'left';
+
+        const titulo = document.createElement('h2');
+        const linkTitulo = document.createElement('a');
+        linkTitulo.href = nivel.url;
+        linkTitulo.target = "_blank";
+        linkTitulo.textContent = nivel.titulo;
+        linkTitulo.style.fontSize = '1.5em';
+        linkTitulo.style.color = '#222';
+        titulo.appendChild(linkTitulo);
+
+        const stats = document.createElement('p');
+        stats.textContent = `Creador: ${nivel.creador} | Ranchopoints: ${nivel.puntos}`;
+
+        infoDiv.appendChild(titulo);
+        infoDiv.appendChild(stats);
+
+        nivelDiv.appendChild(thumb);
+        nivelDiv.appendChild(infoDiv);
+
+        panel.appendChild(nivelDiv);
+      });
+    })
+    .catch(err => {
+      console.error("Error cargando CSV:", err);
+      panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
+    });
+</script>
 </body>
 </html>
