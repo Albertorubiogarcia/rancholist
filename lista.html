@@ -42,10 +42,10 @@
       const niveles = lines.map(line => {
         const cols = line.split(';');
         return {
-          url: cols[0],        // URL del vídeo
-          titulo: cols[1],     // Título
-          creador: cols[2],    // Creador
-          ranchopoints: cols[3] // Ranchopoints
+          url: cols[0],
+          titulo: cols[1],
+          creador: cols[2],
+          ranchopoints: cols[3]
         };
       });
 
@@ -60,7 +60,7 @@
         nivelDiv.style.padding = '15px';
         nivelDiv.style.borderRadius = '10px';
 
-        // Extraer ID del video desde distintas URLs
+        // Extraer ID del video
         let videoId = "";
         const url = nivel.url.trim();
 
@@ -75,17 +75,30 @@
         thumb.href = nivel.url;
         thumb.target = "_blank";
         thumb.classList.add('thumb');
-        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/maxresdefault.jpg')`;
         thumb.style.aspectRatio = '16 / 9';
         thumb.style.width = '240px';
         thumb.style.borderRadius = '10px';
         thumb.style.flexShrink = '0';
-        thumb.style.backgroundSize = '110% auto'; // recorta franjas negras
+        thumb.style.backgroundSize = 'cover';
         thumb.style.backgroundPosition = 'center';
         thumb.style.backgroundRepeat = 'no-repeat';
         thumb.style.overflow = 'hidden';
+        thumb.style.backgroundColor = '#000'; // fondo negro por si tarda en cargar
 
-        // Información del nivel
+        // Primero intenta maxresdefault, si falla usa hqdefault
+        const testImage = new Image();
+        const maxRes = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+        testImage.onload = () => {
+          thumb.style.backgroundImage = `url('${maxRes}')`;
+        };
+        testImage.onerror = () => {
+          thumb.style.backgroundImage = `url('${fallback}')`;
+        };
+        testImage.src = maxRes;
+
+        // Info del nivel
         const infoDiv = document.createElement('div');
         infoDiv.style.display = 'flex';
         infoDiv.style.flexDirection = 'column';
@@ -97,7 +110,7 @@
         linkTitulo.href = nivel.url;
         linkTitulo.target = "_blank";
         linkTitulo.textContent = nivel.titulo;
-        linkTitulo.style.fontSize = '1.4em'; // más grande y visible
+        linkTitulo.style.fontSize = '1.4em';
         linkTitulo.style.fontWeight = '600';
         linkTitulo.style.color = '#222';
         titulo.appendChild(linkTitulo);
