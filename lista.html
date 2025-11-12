@@ -18,75 +18,86 @@
 <div id="panel-niveles"></div>
 
 <script>
-document.getElementById('csvInput').addEventListener('change', function(e){
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(event){
-        const csv = event.target.result;
-        const lines = csv.trim().split('\n');
-        const headers = lines.shift().split(';'); // usa ; si tu CSV tiene punto y coma
-        const niveles = lines.map(line => {
-            const cols = line.split(';');
-            return {
-                miniatura: cols[0],
-                url: cols[1],
-                titulo: cols[2],
-                stats: {
-                    Creador: cols[3],
-                    Ranchopoints: cols[4]
-                }
-            };
-        });
+  // ID del contenedor donde se mostrarán los niveles
+  const panel = document.getElementById('panel-niveles');
 
-        const panel = document.getElementById('panel-niveles');
-        panel.innerHTML = ''; // limpia
-        niveles.forEach(nivel => {
-            const nivelDiv = document.createElement('div');
-            nivelDiv.classList.add('nivel');
-            nivelDiv.style.display = 'flex';
-            nivelDiv.style.alignItems = 'center';
-            nivelDiv.style.margin = '10px 0';
-            nivelDiv.style.background = 'white';
-            nivelDiv.style.padding = '15px';
-            nivelDiv.style.borderRadius = '10px';
+  // Cargar CSV desde la misma carpeta
+  fetch('niveles.csv')
+    .then(response => {
+      if (!response.ok) throw new Error('No se pudo cargar el CSV');
+      return response.text();
+    })
+    .then(csv => {
+      // Separar líneas y cabeceras
+      const lines = csv.trim().split('\n');
+      const headers = lines.shift().split(';'); // Delimitador ';' de tu CSV
 
-            const thumb = document.createElement('a');
-            thumb.href = nivel.url;
-            thumb.target = "_blank";
-            thumb.classList.add('thumb');
-            thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
-            thumb.style.width = '200px';
-            thumb.style.height = '116px';
-            thumb.style.borderRadius = '10px';
-            thumb.style.flexShrink = '0';
+      // Convertir líneas a objetos
+      const niveles = lines.map(line => {
+        const cols = line.split(';');
+        return {
+          miniatura: cols[0],
+          url: cols[1],
+          titulo: cols[2],
+          stats: {
+            Creador: cols[3],
+            Ranchopoints: cols[4]
+          }
+        };
+      });
 
-            const infoDiv = document.createElement('div');
-            infoDiv.style.display = 'flex';
-            infoDiv.style.flexDirection = 'column';
-            infoDiv.style.marginLeft = '20px';
+      // Generar HTML para cada nivel
+      niveles.forEach(nivel => {
+        const nivelDiv = document.createElement('div');
+        nivelDiv.classList.add('nivel');
+        nivelDiv.style.display = 'flex';
+        nivelDiv.style.alignItems = 'center';
+        nivelDiv.style.margin = '10px 0';
+        nivelDiv.style.background = 'white';
+        nivelDiv.style.padding = '15px';
+        nivelDiv.style.borderRadius = '10px';
 
-            const titulo = document.createElement('h2');
-            const linkTitulo = document.createElement('a');
-            linkTitulo.href = nivel.url;
-            linkTitulo.target = "_blank";
-            linkTitulo.textContent = nivel.titulo;
-            linkTitulo.style.fontSize = '1.5em';
-            titulo.appendChild(linkTitulo);
+        // Miniatura
+        const thumb = document.createElement('a');
+        thumb.href = nivel.url;
+        thumb.target = "_blank";
+        thumb.classList.add('thumb');
+        thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
+        thumb.style.width = '200px';
+        thumb.style.height = '116px';
+        thumb.style.borderRadius = '10px';
+        thumb.style.flexShrink = "0";
 
-            const stats = document.createElement('p');
-            stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+        // Información del nivel
+        const infoDiv = document.createElement('div');
+        infoDiv.style.display = 'flex';
+        infoDiv.style.flexDirection = 'column';
+        infoDiv.style.marginLeft = '20px';
 
-            infoDiv.appendChild(titulo);
-            infoDiv.appendChild(stats);
+        const titulo = document.createElement('h2');
+        const linkTitulo = document.createElement('a');
+        linkTitulo.href = nivel.url;
+        linkTitulo.target = "_blank";
+        linkTitulo.textContent = nivel.titulo;
+        linkTitulo.style.fontSize = '1.5em';
+        titulo.appendChild(linkTitulo);
 
-            nivelDiv.appendChild(thumb);
-            nivelDiv.appendChild(infoDiv);
+        const stats = document.createElement('p');
+        stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
 
-            panel.appendChild(nivelDiv);
-        });
-    };
-    reader.readAsText(file);
-});
+        infoDiv.appendChild(titulo);
+        infoDiv.appendChild(stats);
+
+        nivelDiv.appendChild(thumb);
+        nivelDiv.appendChild(infoDiv);
+
+        panel.appendChild(nivelDiv);
+      });
+    })
+    .catch(err => {
+      console.error("Error cargando CSV:", err);
+      panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
+    });
 </script>
 </body>
 </html>
