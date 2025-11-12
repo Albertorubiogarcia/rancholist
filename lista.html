@@ -7,90 +7,102 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- Header / Barra de navegación -->
+  <header>
+    <nav class="center collapse underlined see-through">
+      <div class="nav-icon nav-nohide" style="margin-left: 20px;">
+        <a href="index.html">
+          <img src="icono.png" style="height:70px" alt="Logo">
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenedor de niveles -->
   <div class="niveles-container">
     <div class="panel" id="panel-niveles">
       <!-- Los niveles se generarán aquí -->
     </div>
   </div>
 
-<script>
-  // Cargar CSV desde la misma carpeta
-  fetch('niveles.csv')
-    .then(response => {
-      if (!response.ok) throw new Error('No se pudo cargar el CSV');
-      return response.text();
-    })
-    .then(csv => {
-      // Separar líneas y cabeceras
-      const lines = csv.trim().split('\n');
-      const headers = lines.shift().split(';'); // Delimitador ';' de tu CSV
+  <script>
+    const panel = document.getElementById('panel-niveles');
 
-      // Convertir líneas a objetos
-      const niveles = lines.map(line => {
-        const cols = line.split(';');
-        return {
-          miniatura: cols[0],
-          url: cols[1],
-          titulo: cols[2],
-          stats: {
-            Creador: cols[3],
-            Ranchopoints: cols[4]
-          }
-        };
+    // Cargar CSV desde la carpeta
+    fetch('niveles.csv')
+      .then(response => {
+        if (!response.ok) throw new Error('No se pudo cargar el CSV');
+        return response.text();
+      })
+      .then(csv => {
+        const lines = csv.trim().split('\n');
+        const headers = lines.shift().split(';'); // Delimitador ';'
+
+        const niveles = lines.map(line => {
+          const cols = line.split(';');
+          return {
+            miniatura: cols[0],
+            url: cols[1],
+            titulo: cols[2],
+            stats: {
+              Creador: cols[3],
+              Ranchopoints: cols[4]
+            }
+          };
+        });
+
+        niveles.forEach(nivel => {
+          const nivelDiv = document.createElement('div');
+          nivelDiv.classList.add('nivel');
+          nivelDiv.style.display = 'flex';
+          nivelDiv.style.alignItems = 'center';
+          nivelDiv.style.margin = '10px 0';
+          nivelDiv.style.background = 'white';
+          nivelDiv.style.padding = '15px';
+          nivelDiv.style.borderRadius = '10px';
+
+          // Miniatura
+          const thumb = document.createElement('a');
+          thumb.href = nivel.url;
+          thumb.target = "_blank";
+          thumb.classList.add('thumb');
+          thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
+          thumb.style.width = '200px';
+          thumb.style.height = '116px';
+          thumb.style.borderRadius = '10px';
+          thumb.style.flexShrink = "0";
+
+          // Info del nivel
+          const infoDiv = document.createElement('div');
+          infoDiv.style.display = 'flex';
+          infoDiv.style.flexDirection = 'column';
+          infoDiv.style.marginLeft = '20px';
+
+          const titulo = document.createElement('h2');
+          const linkTitulo = document.createElement('a');
+          linkTitulo.href = nivel.url;
+          linkTitulo.target = "_blank";
+          linkTitulo.textContent = nivel.titulo;
+          linkTitulo.style.fontSize = '1.7em'; // más grande
+          titulo.appendChild(linkTitulo);
+
+          const stats = document.createElement('p');
+          stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+
+          infoDiv.appendChild(titulo);
+          infoDiv.appendChild(stats);
+
+          nivelDiv.appendChild(thumb);
+          nivelDiv.appendChild(infoDiv);
+
+          panel.appendChild(nivelDiv);
+        });
+      })
+      .catch(err => {
+        console.error("Error cargando CSV:", err);
+        panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
       });
-
-      // Generar HTML para cada nivel
-      niveles.forEach(nivel => {
-        const nivelDiv = document.createElement('div');
-        nivelDiv.classList.add('nivel');
-        nivelDiv.style.display = 'flex';
-        nivelDiv.style.alignItems = 'center';
-        nivelDiv.style.margin = '10px 0';
-        nivelDiv.style.background = 'white';
-        nivelDiv.style.padding = '15px';
-        nivelDiv.style.borderRadius = '10px';
-
-        // Miniatura
-        const thumb = document.createElement('a');
-        thumb.href = nivel.url;
-        thumb.target = "_blank";
-        thumb.classList.add('thumb');
-        thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
-        thumb.style.width = '200px';
-        thumb.style.height = '116px';
-        thumb.style.borderRadius = '10px';
-        thumb.style.flexShrink = "0";
-
-        // Información del nivel
-        const infoDiv = document.createElement('div');
-        infoDiv.style.display = 'flex';
-        infoDiv.style.flexDirection = 'column';
-        infoDiv.style.marginLeft = '20px';
-
-        const titulo = document.createElement('h2');
-        const linkTitulo = document.createElement('a');
-        linkTitulo.href = nivel.url;
-        linkTitulo.target = "_blank";
-        linkTitulo.textContent = nivel.titulo;
-        linkTitulo.style.fontSize = '1.5em';
-        titulo.appendChild(linkTitulo);
-
-        const stats = document.createElement('p');
-        stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
-
-        infoDiv.appendChild(titulo);
-        infoDiv.appendChild(stats);
-
-        nivelDiv.appendChild(thumb);
-        nivelDiv.appendChild(infoDiv);
-
-        panel.appendChild(nivelDiv);
-      });
-    })
-    .catch(err => {
-      console.error("Error cargando CSV:", err);
-      panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
-    });
-</script>
+  </script>
 </body>
 </html>
