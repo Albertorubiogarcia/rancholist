@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RANCHOLIST</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>MAINLIST</h1>
+        <ul id="niveles">
+        <li>
+            <button onclick="mostrarJugadores(1)">Nivel 1 - Fácil</button>
+        </li>
+        <li>
+            <button onclick="mostrarJugadores(2)">Nivel 2 - Fácil</button>
+        </li>
+        <li>
+            <button onclick="mostrarJugadores(3)">Nivel 3 - Medio</button>
+        </li>
+        <!-- ... continúa hasta Nivel 150 -->
+    </ul>
+            <script>
+        // Aquí defines manualmente los jugadores de cada nivel
+        const jugadoresPorNivel = {
+            1: ['Ana', 'Luis', 'Carlos'],
+            2: ['Bea', 'Juan'],
+            3: ['Pedro', 'Sofía'],
+            // ... hasta Nivel 150
+        };
+
+        function mostrarJugadores(nivel) {
+            const nivelSeleccionado = document.getElementById('nivel-seleccionado');
+            const jugadoresNivelUl = document.getElementById('jugadores-nivel');
+
+            nivelSeleccionado.textContent = `Nivel ${nivel}`;
+
+            // Limpiar lista anterior
+            jugadoresNivelUl.innerHTML = '';
+
+            // Agregar jugadores
+            if (jugadoresPorNivel[nivel]) {
+                jugadoresPorNivel[nivel].forEach(jugador => {
+                    const liJugador = document.createElement('li');
+                    liJugador.textContent = jugador;
+                    jugadoresNivelUl.appendChild(liJugador);
+                });
+            } else {
+                const liJugador = document.createElement('li');
+                liJugador.textContent = 'Ningún jugador ha completado este nivel todavía.';
+                jugadoresNivelUl.appendChild(liJugador);
+            }
+        }
+    </script>
+</body>
+</html>
