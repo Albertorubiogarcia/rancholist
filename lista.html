@@ -29,7 +29,6 @@
 <script>
   const panel = document.getElementById('panel-niveles');
 
-  // Cargar CSV desde la carpeta
   fetch('niveles.csv')
     .then(response => {
       if (!response.ok) throw new Error('No se pudo cargar el CSV');
@@ -37,16 +36,13 @@
     })
     .then(csv => {
       const lines = csv.trim().split('\n');
-      const headers = lines.shift().split(';'); // Delimitador ';'
+      const headers = lines.shift().split(';').map(h => h.trim().toLowerCase());
 
       const niveles = lines.map(line => {
-        const cols = line.split(';');
-        return {
-          url: cols[0],       // la primera columna será la URL del video
-          titulo: cols[1],    // título
-          creador: cols[2],
-          puntos: cols[3]
-        };
+        const cols = line.split(';').map(c => c.trim());
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = cols[i]);
+        return obj;
       });
 
       niveles.forEach(nivel => {
@@ -59,12 +55,11 @@
         nivelDiv.style.padding = '15px';
         nivelDiv.style.borderRadius = '10px';
 
-        // 🔍 Extraer el ID del video (de youtu.be o youtube.com/watch?v=)
-        let videoId = "";
-        const match = nivel.url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-        if (match) videoId = match[1];
+        // Extraer ID del video
+        const match = nivel.url?.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        const videoId = match ? match[1] : '';
 
-        // Miniatura generada automáticamente
+        // Miniatura automática
         const thumb = document.createElement('a');
         thumb.href = nivel.url;
         thumb.target = "_blank";
@@ -77,7 +72,7 @@
         thumb.style.backgroundSize = 'cover';
         thumb.style.backgroundPosition = 'center';
 
-        // Información del nivel
+        // Info del nivel
         const infoDiv = document.createElement('div');
         infoDiv.style.display = 'flex';
         infoDiv.style.flexDirection = 'column';
@@ -88,13 +83,13 @@
         const linkTitulo = document.createElement('a');
         linkTitulo.href = nivel.url;
         linkTitulo.target = "_blank";
-        linkTitulo.textContent = nivel.titulo;
+        linkTitulo.textContent = nivel.titulo || '(Sin título)';
         linkTitulo.style.fontSize = '1.5em';
         linkTitulo.style.color = '#222';
         titulo.appendChild(linkTitulo);
 
         const stats = document.createElement('p');
-        stats.textContent = `Creador: ${nivel.creador} | Ranchopoints: ${nivel.puntos}`;
+        stats.textContent = `Creador: ${nivel.creador || 'Desconocido'} | Ranchopoints: ${nivel.ranchopoints || 'N/A'}`;
 
         infoDiv.appendChild(titulo);
         infoDiv.appendChild(stats);
