@@ -29,6 +29,14 @@
 <script>
   const panel = document.getElementById('panel-niveles');
 
+  // 🧠 Función robusta para extraer el ID de cualquier URL de YouTube
+  function getYouTubeID(url) {
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : '';
+  }
+
+  // Cargar CSV desde la carpeta (usa fetch)
   fetch('niveles.csv')
     .then(response => {
       if (!response.ok) throw new Error('No se pudo cargar el CSV');
@@ -36,30 +44,32 @@
     })
     .then(csv => {
       const lines = csv.trim().split('\n');
-      const headers = lines.shift().split(';').map(h => h.trim().toLowerCase());
+      const headers = lines.shift().split(';'); // Usa ';' como delimitador
 
       const niveles = lines.map(line => {
-        const cols = line.split(';').map(c => c.trim());
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = cols[i]);
-        return obj;
+        const cols = line.split(';');
+        return {
+          url: cols[0],        // Primera columna: URL del video
+          titulo: cols[1],     // Segunda columna: título
+          creador: cols[2],    // Tercera columna: creador
+          ranchopoints: cols[3] // Cuarta columna: Ranchopoints
+        };
       });
 
+      // Generar HTML para cada nivel
       niveles.forEach(nivel => {
+        const videoId = getYouTubeID(nivel.url);
+
         const nivelDiv = document.createElement('div');
         nivelDiv.classList.add('nivel');
         nivelDiv.style.display = 'flex';
         nivelDiv.style.alignItems = 'center';
-        nivelDiv.style.margin = '20px 0';
+        nivelDiv.style.margin = '10px 0';
         nivelDiv.style.background = 'white';
         nivelDiv.style.padding = '15px';
         nivelDiv.style.borderRadius = '10px';
 
-        // Extraer ID del video
-        const match = nivel.url?.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-        const videoId = match ? match[1] : '';
-
-        // Miniatura automática
+        // Miniatura (desde el ID del video)
         const thumb = document.createElement('a');
         thumb.href = nivel.url;
         thumb.target = "_blank";
@@ -72,24 +82,24 @@
         thumb.style.backgroundSize = 'cover';
         thumb.style.backgroundPosition = 'center';
 
-        // Info del nivel
+        // Info del nivel (texto)
         const infoDiv = document.createElement('div');
         infoDiv.style.display = 'flex';
         infoDiv.style.flexDirection = 'column';
         infoDiv.style.marginLeft = '20px';
-        infoDiv.style.textAlign = 'left';
 
         const titulo = document.createElement('h2');
         const linkTitulo = document.createElement('a');
         linkTitulo.href = nivel.url;
         linkTitulo.target = "_blank";
-        linkTitulo.textContent = nivel.titulo || '(Sin título)';
-        linkTitulo.style.fontSize = '1.5em';
+        linkTitulo.textContent = nivel.titulo;
+        linkTitulo.style.fontSize = '1.3em';
+        linkTitulo.style.textDecoration = 'none';
         linkTitulo.style.color = '#222';
         titulo.appendChild(linkTitulo);
 
         const stats = document.createElement('p');
-        stats.textContent = `Creador: ${nivel.creador || 'Desconocido'} | Ranchopoints: ${nivel.ranchopoints || 'N/A'}`;
+        stats.textContent = `Creador: ${nivel.creador} | Ranchopoints: ${nivel.ranchopoints}`;
 
         infoDiv.appendChild(titulo);
         infoDiv.appendChild(stats);
