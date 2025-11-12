@@ -71,16 +71,17 @@
 
         // Miniatura (desde el ID del video)
         const thumb = document.createElement('a');
-        thumb.href = nivel.url;
-        thumb.target = "_blank";
-        thumb.classList.add('thumb');
-        thumb.style.width = '200px';
-        thumb.style.height = '116px';
-        thumb.style.borderRadius = '10px';
-        thumb.style.flexShrink = "0";
-        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
-        thumb.style.backgroundSize = 'cover';
-        thumb.style.backgroundPosition = 'center';
+thumb.href = nivel.url;
+thumb.target = "_blank";
+thumb.classList.add('thumb');
+thumb.style.width = '200px';
+thumb.style.height = '112.5px'; // Relación 16:9 exacta
+thumb.style.borderRadius = '10px';
+thumb.style.overflow = 'hidden'; // Evita que sobresalga la imagen
+thumb.style.flexShrink = "0";
+thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
+thumb.style.backgroundSize = 'cover';
+thumb.style.backgroundPosition = 'center';
 
         // Info del nivel (texto)
         const infoDiv = document.createElement('div');
