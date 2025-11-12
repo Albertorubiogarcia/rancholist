@@ -3,54 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANCHOLIST</title>
+    <title>Lista de Niveles</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>MAINLIST</h1>
-        <ul id="niveles">
-        <li>
-            <button onclick="mostrarJugadores(1)">Nivel 1 - Fácil</button>
-        </li>
-        <li>
-            <button onclick="mostrarJugadores(2)">Nivel 2 - Fácil</button>
-        </li>
-        <li>
-            <button onclick="mostrarJugadores(3)">Nivel 3 - Medio</button>
-        </li>
-        <!-- ... continúa hasta Nivel 150 -->
-    </ul>
-            <script>
-        // Aquí defines manualmente los jugadores de cada nivel
-        const jugadoresPorNivel = {
-            1: ['Ana', 'Luis', 'Carlos'],
-            2: ['Bea', 'Juan'],
-            3: ['Pedro', 'Sofía'],
-            // ... hasta Nivel 150
-        };
+  <div class="niveles-container">
+    <div class="panel" id="panel-niveles">
+      <!-- Los niveles se generarán aquí -->
+    </div>
+  </div>
 
-        function mostrarJugadores(nivel) {
-            const nivelSeleccionado = document.getElementById('nivel-seleccionado');
-            const jugadoresNivelUl = document.getElementById('jugadores-nivel');
+ <input type="file" id="csvInput" accept=".csv">
 
-            nivelSeleccionado.textContent = `Nivel ${nivel}`;
+<div id="panel-niveles"></div>
 
-            // Limpiar lista anterior
-            jugadoresNivelUl.innerHTML = '';
+<script>
+document.getElementById('csvInput').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event){
+        const csv = event.target.result;
+        const lines = csv.trim().split('\n');
+        const headers = lines.shift().split(';'); // usa ; si tu CSV tiene punto y coma
+        const niveles = lines.map(line => {
+            const cols = line.split(';');
+            return {
+                miniatura: cols[0],
+                url: cols[1],
+                titulo: cols[2],
+                stats: {
+                    Creador: cols[3],
+                    Ranchopoints: cols[4]
+                }
+            };
+        });
 
-            // Agregar jugadores
-            if (jugadoresPorNivel[nivel]) {
-                jugadoresPorNivel[nivel].forEach(jugador => {
-                    const liJugador = document.createElement('li');
-                    liJugador.textContent = jugador;
-                    jugadoresNivelUl.appendChild(liJugador);
-                });
-            } else {
-                const liJugador = document.createElement('li');
-                liJugador.textContent = 'Ningún jugador ha completado este nivel todavía.';
-                jugadoresNivelUl.appendChild(liJugador);
-            }
-        }
-    </script>
+        const panel = document.getElementById('panel-niveles');
+        panel.innerHTML = ''; // limpia
+        niveles.forEach(nivel => {
+            const nivelDiv = document.createElement('div');
+            nivelDiv.classList.add('nivel');
+            nivelDiv.style.display = 'flex';
+            nivelDiv.style.alignItems = 'center';
+            nivelDiv.style.margin = '10px 0';
+            nivelDiv.style.background = 'white';
+            nivelDiv.style.padding = '15px';
+            nivelDiv.style.borderRadius = '10px';
+
+            const thumb = document.createElement('a');
+            thumb.href = nivel.url;
+            thumb.target = "_blank";
+            thumb.classList.add('thumb');
+            thumb.style.backgroundImage = `url('${nivel.miniatura}')`;
+            thumb.style.width = '200px';
+            thumb.style.height = '116px';
+            thumb.style.borderRadius = '10px';
+            thumb.style.flexShrink = '0';
+
+            const infoDiv = document.createElement('div');
+            infoDiv.style.display = 'flex';
+            infoDiv.style.flexDirection = 'column';
+            infoDiv.style.marginLeft = '20px';
+
+            const titulo = document.createElement('h2');
+            const linkTitulo = document.createElement('a');
+            linkTitulo.href = nivel.url;
+            linkTitulo.target = "_blank";
+            linkTitulo.textContent = nivel.titulo;
+            linkTitulo.style.fontSize = '1.5em';
+            titulo.appendChild(linkTitulo);
+
+            const stats = document.createElement('p');
+            stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+
+            infoDiv.appendChild(titulo);
+            infoDiv.appendChild(stats);
+
+            nivelDiv.appendChild(thumb);
+            nivelDiv.appendChild(infoDiv);
+
+            panel.appendChild(nivelDiv);
+        });
+    };
+    reader.readAsText(file);
+});
+</script>
 </body>
 </html>
