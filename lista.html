@@ -37,20 +37,27 @@
     })
     .then(csv => {
       const lines = csv.trim().split('\n');
-      const headers = lines.shift().split(';'); // Delimitador ";"
+      lines.shift(); // eliminar cabecera
 
       const niveles = lines.map(line => {
         const cols = line.split(';');
         return {
-          url: cols[0],
-          titulo: cols[1],
-          creador: cols[2],
-          ranchopoints: cols[3]
+          url: cols[0].trim(),
+          titulo: cols[1].trim(),
+          creador: cols[2].trim(),
+          ranchopoints: cols[3].trim()
         };
       });
 
       niveles.forEach(nivel => {
-        // Crear contenedor del nivel
+        // --- Extraer ID de video correctamente ---
+        let videoId = '';
+        const match = nivel.url.match(
+          /(?:youtu\.be\/|v=)([A-Za-z0-9_-]{11})/
+        );
+        if (match) videoId = match[1];
+
+        // --- Crear contenedor principal ---
         const nivelDiv = document.createElement('div');
         nivelDiv.classList.add('nivel');
         nivelDiv.style.display = 'flex';
@@ -59,51 +66,36 @@
         nivelDiv.style.background = 'white';
         nivelDiv.style.padding = '15px';
         nivelDiv.style.borderRadius = '10px';
+        nivelDiv.style.overflow = 'hidden';
+        nivelDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
 
-        // Extraer ID del video
-        let videoId = "";
-        const url = nivel.url.trim();
-
-        if (url.includes('youtu.be/')) {
-          videoId = url.split('youtu.be/')[1].split(/[?&]/)[0];
-        } else if (url.includes('youtube.com/watch?v=')) {
-          videoId = url.split('v=')[1].split(/[?&]/)[0];
-        }
-
-        // Crear miniatura del video
+        // --- Miniatura ---
         const thumb = document.createElement('a');
         thumb.href = nivel.url;
         thumb.target = "_blank";
-        thumb.classList.add('thumb');
-        thumb.style.aspectRatio = '16 / 9';
         thumb.style.width = '240px';
+        thumb.style.aspectRatio = '16 / 9';
         thumb.style.borderRadius = '10px';
         thumb.style.flexShrink = '0';
-        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundColor = '#000';
         thumb.style.backgroundPosition = 'center';
         thumb.style.backgroundRepeat = 'no-repeat';
+        thumb.style.backgroundSize = 'cover';
         thumb.style.overflow = 'hidden';
-        thumb.style.backgroundColor = '#000'; // fondo negro por si tarda en cargar
 
-        // Primero intenta maxresdefault, si falla usa hqdefault
-        const testImage = new Image();
+        // Fallback de miniatura
         const maxRes = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
         const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        const testImg = new Image();
+        testImg.onload = () => thumb.style.backgroundImage = `url('${maxRes}')`;
+        testImg.onerror = () => thumb.style.backgroundImage = `url('${fallback}')`;
+        testImg.src = maxRes;
 
-        testImage.onload = () => {
-          thumb.style.backgroundImage = `url('${maxRes}')`;
-        };
-        testImage.onerror = () => {
-          thumb.style.backgroundImage = `url('${fallback}')`;
-        };
-        testImage.src = maxRes;
-
-        // Info del nivel
+        // --- Info ---
         const infoDiv = document.createElement('div');
         infoDiv.style.display = 'flex';
         infoDiv.style.flexDirection = 'column';
         infoDiv.style.marginLeft = '20px';
-        infoDiv.style.textAlign = 'left';
 
         const titulo = document.createElement('h2');
         const linkTitulo = document.createElement('a');
@@ -117,7 +109,7 @@
 
         const stats = document.createElement('p');
         stats.textContent = `Creador: ${nivel.creador} | Ranchopoints: ${nivel.ranchopoints}`;
-        stats.style.margin = '5px 0 0';
+        stats.style.marginTop = '6px';
         stats.style.color = '#555';
 
         infoDiv.appendChild(titulo);
@@ -125,7 +117,6 @@
 
         nivelDiv.appendChild(thumb);
         nivelDiv.appendChild(infoDiv);
-
         panel.appendChild(nivelDiv);
       });
     })
