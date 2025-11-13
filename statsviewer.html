@@ -252,9 +252,9 @@ fetch('niveles.csv')
       };
 
       // Crear secciones siempre, aunque estén vacías
-      crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
-      crearSeccion(extended, "Extended (51-100)", "color:black;");
-      crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
+      crearSeccion(mainlist, "Mainlist", "font-weight:bold; color:black;");
+      crearSeccion(extended, "Extended", "color:black;");
+      crearSeccion(legacy, "Legacy", "color:gray;");
     }
   })
   .catch(err => console.error("Error cargando CSV:", err));
