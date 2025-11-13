@@ -5,18 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats Viewer</title>
 <link rel="stylesheet" href="style.css">
+<style>
+
+  .main-container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 70px);
+  }
+
+  .ranking {
+    width: 250px;
+    overflow-y: auto;
+    background: white;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+  }
+
+  .ranking .jugador {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+
+  .ranking .jugador:hover,
+  .ranking .jugador.active {
+    background-color: #e0f7e0;
+  }
+
+  .perfil-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #fff;
+  }
+
+  .perfil-container h2 {
+    margin-top: 0;
+  }
+
+  .nivel {
+    display: flex;
+    margin: 10px 0;
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 8px;
+    align-items: center;
+  }
+
+  .thumb {
+    width: 120px;
+    height: 68px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+
+  .demon-info {
+    flex: 1;
+  }
+
+  @media (max-width: 768px) {
+    .main-container {
+      flex-direction: column;
+    }
+    .ranking {
+      width: 100%;
+      height: 200px;
+      border-right: none;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+</style>
 </head>
 <body>
 
 <header>
   <nav>
     <div class="nav-left">
-      <a href="index.html" class="logo-link"><img src="icono.png" alt="Logo" class="logo-img"></a>
+      <!-- Logo -->
+      <a href="index.html" class="logo-link">
+        <img src="icono.png" alt="Logo" class="logo-img">
+      </a>
+      <!-- Enlaces -->
       <a href="lista.html" class="nav-item">RANCHOLIST</a>
       <a href="statsviewer.html" class="nav-item">STATSVIEWER</a>
     </div>
   </nav>
 </header>
+
 
 <div class="main-container">
   <div class="ranking" id="ranking">
@@ -26,7 +104,6 @@
     <h2>Selecciona un jugador para ver su perfil</h2>
   </div>
 </div>
-
 <script>
 const rankingDiv = document.getElementById('ranking');
 const perfilContainer = document.getElementById('perfil-container');
@@ -154,6 +231,7 @@ fetch('niveles.csv')
 
   });
 </script>
+
 
 </body>
 </html>
