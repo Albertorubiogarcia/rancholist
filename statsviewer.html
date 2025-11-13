@@ -164,11 +164,11 @@ fetch('niveles.csv')
 
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Ranking de jugadores
-    ranking.forEach((jugador, index) => {
+    // Ranking de jugadores: mostrar solo nombre + puntos
+    ranking.forEach(jugador => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      divJugador.innerHTML = `#${index+1} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
+      divJugador.innerHTML = `${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
       divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
       rankingDiv.appendChild(divJugador);
     });
@@ -186,12 +186,12 @@ fetch('niveles.csv')
       let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
       if(hardest){
         const hardestDiv = document.createElement('div');
-        hardestDiv.style.marginBottom = '20px';
+        hardestDiv.style.marginBottom = '40px'; // mucho más espacio
         const hHeading = document.createElement('h3');
         hHeading.textContent = "Hardest";
         hHeading.style.fontWeight = "bold";
         hHeading.style.fontSize = "1.3em";
-        hHeading.style.marginBottom = "10px";
+        hHeading.style.marginBottom = "15px";
         hardestDiv.appendChild(hHeading);
 
         const p = document.createElement('p');
@@ -199,7 +199,7 @@ fetch('niveles.csv')
         if(hardest.urlVideo){
           const a = document.createElement('a');
           a.href = hardest.urlVideo;
-          a.textContent = limpiarTitulo(hardest.titulo); // quitar número
+          a.textContent = limpiarTitulo(hardest.titulo);
           a.target = "_blank";
           a.style = "font-weight:bold; color:black; text-decoration:none;";
           span.appendChild(a);
@@ -218,13 +218,13 @@ fetch('niveles.csv')
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
-        section.style.marginBottom = "20px";
+        section.style.marginBottom = "40px"; // aumentar separación entre secciones
 
         const heading = document.createElement('h3');
         heading.textContent = title;
         heading.style.fontWeight = "bold";
         heading.style.fontSize = "1.2em";
-        heading.style.marginBottom = "10px";
+        heading.style.marginBottom = "15px";
         section.appendChild(heading);
 
         const p = document.createElement('p');
@@ -237,7 +237,7 @@ fetch('niveles.csv')
           if(nivel.urlVideo){
             const a = document.createElement('a');
             a.href = nivel.urlVideo;
-            a.textContent = limpiarTitulo(nivel.titulo); // quitar número
+            a.textContent = limpiarTitulo(nivel.titulo);
             a.target = "_blank";
             a.style = estilo + "text-decoration:none;";
             span.appendChild(a);
