@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- HEADER -->
   <header>
     <nav>
       <div class="nav-icon">
@@ -35,15 +34,13 @@
         const lines = csv.trim().split('\n');
         lines.shift(); // quitar cabecera
 
-        lines.forEach(line => {
+        lines.forEach((line, index) => {
           const cols = line.split(';');
           const url = cols[1];
           const titulo = cols[2];
-          const creador = cols[3];
-          const puntos = cols[4];
           const jugadores = cols[5] ? cols[5].split(',').map(j => j.trim()) : [];
 
-          // ID de video para la miniatura
+          // ID de video para miniatura
           const match = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
           const videoId = match ? match[1] : null;
           const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
@@ -51,7 +48,7 @@
           const nivelDiv = document.createElement('div');
           nivelDiv.classList.add('nivel');
 
-          // Miniatura (enlace al video)
+          // Miniatura (link al video)
           const thumb = document.createElement('a');
           thumb.href = url;
           thumb.target = "_blank";
@@ -62,36 +59,19 @@
           thumb.style.backgroundSize = 'cover';
           thumb.style.backgroundPosition = 'center';
 
-          // Info del nivel
+          // Nombre del nivel → link a página de detalle
           const infoDiv = document.createElement('div');
           infoDiv.classList.add('demon-info');
 
-          // Nombre del nivel como botón desplegable
-          const tituloBtn = document.createElement('button');
-          tituloBtn.textContent = titulo;
-          tituloBtn.style.fontSize = '1.3em';
-          tituloBtn.style.background = 'none';
-          tituloBtn.style.border = 'none';
-          tituloBtn.style.cursor = 'pointer';
-          tituloBtn.style.padding = '0';
-          tituloBtn.style.textAlign = 'left';
-          tituloBtn.style.color = 'var(--color-text-accent)';
+          const tituloLink = document.createElement('a');
+          tituloLink.textContent = titulo;
+          tituloLink.href = `nivel.html?id=${index}`; // usamos el índice como ID
+          tituloLink.style.fontSize = '1.3em';
+          tituloLink.style.color = 'var(--color-text-accent)';
+          tituloLink.style.textDecoration = 'none';
+          tituloLink.style.cursor = 'pointer';
 
-          // Contenedor de jugadores (inicialmente oculto)
-          const jugadoresDiv = document.createElement('div');
-          jugadoresDiv.style.display = 'none';
-          jugadoresDiv.style.marginTop = '10px';
-          jugadoresDiv.innerHTML = jugadores.length > 0 
-            ? `<strong>Jugadores que completaron este nivel:</strong><ul>${jugadores.map(j => `<li>${j}</li>`).join('')}</ul>`
-            : `<em>Nadie ha completado este nivel todavía</em>`;
-
-          // Toggle al hacer clic en el nombre
-          tituloBtn.addEventListener('click', () => {
-            jugadoresDiv.style.display = jugadoresDiv.style.display === 'none' ? 'block' : 'none';
-          });
-
-          infoDiv.appendChild(tituloBtn);
-          infoDiv.appendChild(jugadoresDiv);
+          infoDiv.appendChild(tituloLink);
 
           nivelDiv.appendChild(thumb);
           nivelDiv.appendChild(infoDiv);
@@ -106,5 +86,4 @@
   </script>
 </body>
 </html>
-
 

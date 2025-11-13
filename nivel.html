@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Nivel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="nav-icon">
+        <a href="index.html">
+          <img src="icono.png" alt="Logo" style="height:70px">
+        </a>
+      </div>
+      <div class="nav-links">
+        <a href="lista.html">Lista de Niveles</a>
+        <a href="statsviewer.html">Stats Viewer</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="niveles-container">
+    <div class="panel" id="detalle-nivel"></div>
+  </div>
+
+  <script>
+    const detalle = document.getElementById('detalle-nivel');
+
+    // Obtener id de URL
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    fetch('niveles.csv')
+      .then(r => r.text())
+      .then(csv => {
+        const lines = csv.trim().split('\n');
+        lines.shift(); // quitar cabecera
+
+        if (!id || id >= lines.length) {
+          detalle.innerHTML = "<p>ID de nivel inválido</p>";
+          return;
+        }
+
+        const cols = lines[id].split(';');
+        const url = cols[1];
+        const titulo = cols[2];
+        const creador = cols[3];
+        const puntos = cols[4];
+        const jugadores = cols[5] ? cols[5].split(',').map(j => j.trim()) : [];
+
+        const match = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
+        const videoId = match ? match[1] : null;
+        const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+
+        const nivelDiv = document.createElement('div');
+        nivelDiv.classList.add('nivel');
+
+        const thumb = document.createElement('a');
+        thumb.href = url;
+        thumb.target = "_blank";
+        thumb.classList.add('thumb');
+        thumb.style.backgroundImage = `url('${thumbUrl}')`;
+        thumb.style.width = '320px';
+        thumb.style.height = '180px';
+        thumb.style.backgroundSize = 'cover';
+        thumb.style.backgroundPosition = 'center';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.classList.add('demon-info');
+
+        const tituloH2 = document.createElement('h2');
+        tituloH2.textContent = titulo;
+
+        const statsP = document.createElement('p');
+        statsP.textContent = `Creador: ${creador} | Ranchopoints: ${puntos}`;
+
+        const jugadoresDiv = document.createElement('div');
+        jugadoresDiv.innerHTML = jugadores.length > 0 
+          ? `<strong>Jugadores que completaron este nivel:</strong><ul>${jugadores.map(j => `<li>${j}</li>`).join('')}</ul>`
+          : `<em>Nadie ha completado este nivel todavía</em>`;
+
+        infoDiv.appendChild(tituloH2);
+        infoDiv.appendChild(statsP);
+        infoDiv.appendChild(jugadoresDiv);
+
+        nivelDiv.appendChild(thumb);
+        nivelDiv.appendChild(infoDiv);
+
+        detalle.appendChild(nivelDiv);
+      })
+      .catch(err => {
+        console.error("Error cargando CSV:", err);
+        detalle.innerHTML = "<p>Error al cargar el nivel</p>";
+      });
+  </script>
+</body>
+</html>
