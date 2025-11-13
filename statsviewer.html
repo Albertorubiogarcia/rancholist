@@ -157,14 +157,14 @@ fetch('niveles.csv')
       });
     });
 
-    // Ordenar por puntos
+    // Ordenar jugadores por puntos
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Mostrar lista de jugadores
-    ranking.forEach(jugador => {
+    // Mostrar lista de jugadores con ranking numérico
+    ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      divJugador.textContent = `${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
+      divJugador.textContent = `#${index+1} — ${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
       divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
       rankingDiv.appendChild(divJugador);
     });
@@ -177,34 +177,43 @@ fetch('niveles.csv')
       // Limpiar perfil
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      jugador.niveles.forEach(nivel => {
-        const nivelDiv = document.createElement('div');
-        nivelDiv.classList.add('nivel');
+      // Categorías
+      const mainlist = jugador.niveles.slice(0,50);
+      const extended = jugador.niveles.slice(50,100);
+      const legacy = jugador.niveles.slice(100,150);
 
-        const thumb = document.createElement('div');
-        thumb.classList.add('thumb');
-        let videoId = null;
-        try {
-          const urlObj = new URL(nivel.urlVideo);
-          if(urlObj.hostname.includes('youtu.be')) videoId = urlObj.pathname.slice(1);
-          else if(urlObj.hostname.includes('youtube.com')) videoId = urlObj.searchParams.get('v');
-        } catch(e){ console.warn('URL inválida:', nivel.urlVideo); }
-        if(videoId) {
-          thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg')`;
-        }
+      const crearLista = (nivelesArray, title) => {
+        if(nivelesArray.length === 0) return;
+        const section = document.createElement('div');
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        section.appendChild(heading);
 
-        const info = document.createElement('div');
-        info.classList.add('demon-info');
-        info.innerHTML = `<strong>${nivel.titulo}</strong><br>Ranchopoints: ${nivel.ranchopoints}`;
+        const ul = document.createElement('ul');
+        nivelesArray.forEach(nivel => {
+          const li = document.createElement('li');
+          if(nivel.urlVideo) {
+            const a = document.createElement('a');
+            a.href = nivel.urlVideo;
+            a.textContent = nivel.titulo;
+            a.target = "_blank";
+            li.appendChild(a);
+          } else {
+            li.textContent = nivel.titulo;
+          }
+          ul.appendChild(li);
+        });
 
-        nivelDiv.appendChild(thumb);
-        nivelDiv.appendChild(info);
-        perfilContainer.appendChild(nivelDiv);
-      });
+        section.appendChild(ul);
+        perfilContainer.appendChild(section);
+      };
+
+      crearLista(mainlist, "Mainlist (1-50)");
+      crearLista(extended, "Extended (51-100)");
+      crearLista(legacy, "Legacy (101-150)");
     }
   });
 </script>
-
 </body>
 </html>
 
