@@ -153,9 +153,13 @@
       // Lista de jugadores con links a stats y videos
       const jugadoresDiv = document.createElement('div');
       jugadoresDiv.classList.add('jugadores-list');
+      jugadoresDiv.style.background = '#88cc88'; // verde fuerte de sección
 
       const h3 = document.createElement('h3');
-      h3.textContent = 'Jugadores que han pasado este nivel:';
+      h3.textContent = 'Putos amos';
+      h3.style.marginTop = '0';
+      h3.style.padding = '10px';
+      h3.style.color = 'white';
       jugadoresDiv.appendChild(h3);
 
       if(nivel.jugadores.length === 0 || (nivel.jugadores.length === 1 && nivel.jugadores[0]==='')){
@@ -163,28 +167,34 @@
         p.textContent = 'Ningún jugador registrado.';
         jugadoresDiv.appendChild(p);
       } else {
-        nivel.jugadores.forEach(j => {
-          // Separar nombre y video del jugador (formato CSV: Nombre|URLVideo)
+        nivel.jugadores.forEach((j, index) => {
           const [nombre, video] = j.split('|').map(s => s.trim());
 
           const fila = document.createElement('div');
           fila.classList.add('jugador');
           fila.style.display = 'flex';
-          fila.style.justifyContent = 'space-between';
+          fila.style.justifyContent = 'flex-start'; // junto al contenido
           fila.style.alignItems = 'center';
+          fila.style.gap = '10px'; // espacio entre nombre y video
+          fila.style.padding = '5px 10px';
+
+          // Colores intercalados
+          fila.style.background = index % 2 === 0 ? '#e6ffe6' : 'white';
+          fila.style.borderRadius = '6px';
+          fila.style.marginBottom = '4px';
 
           // Link al perfil del jugador
           const jugadorLink = document.createElement('a');
           jugadorLink.href = `statsviewer.html?jugador=${encodeURIComponent(nombre)}`;
           jugadorLink.textContent = nombre;
           jugadorLink.style.fontWeight = '600';
+          jugadorLink.style.color = '#074d07'; // verde oscuro
 
           // Link al video del jugador
           const videoLink = document.createElement('a');
           videoLink.href = video;
           videoLink.target = "_blank";
           videoLink.textContent = "Ver video";
-          videoLink.style.marginLeft = "10px";
           videoLink.style.fontSize = '0.9em';
           videoLink.style.color = '#0881c6';
 
