@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ranking de Jugadores</title>
+  <title>Stats Viewer</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,37 +16,30 @@
         </a>
       </div>
       <div class="nav-links">
-        <a href="index.html">Niveles</a>
-        <a href="jugadores.html">Jugadores</a>
+        <a href="lista.html">Lista de Niveles</a>
+        <a href="statsviewer.html" class="active">Stats Viewer</a>
       </div>
     </nav>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
   <div class="jugadores-container">
     <div class="panel-jugadores" id="panel-jugadores">
       <h1>Ranking de Jugadores</h1>
-      <!-- Aquí se generarán los jugadores dinámicamente -->
     </div>
   </div>
 
   <script>
     const panelJugadores = document.getElementById('panel-jugadores');
 
-    // Cargar datos desde el mismo CSV que los niveles
     fetch('niveles.csv')
-      .then(response => {
-        if (!response.ok) throw new Error('No se pudo cargar el CSV');
-        return response.text();
-      })
+      .then(r => r.text())
       .then(csv => {
         const lines = csv.trim().split('\n');
-        const headers = lines.shift().split(';');
+        lines.shift();
 
         const niveles = lines.map(line => {
           const cols = line.split(';');
           return {
-            miniatura: cols[0],
             url: cols[1],
             titulo: cols[2],
             creador: cols[3],
@@ -55,59 +48,40 @@
           };
         });
 
-        // Calcular puntos por jugador
         const jugadores = {};
         niveles.forEach(nivel => {
           nivel.jugadores.forEach(nombre => {
-            if (!jugadores[nombre]) {
-              jugadores[nombre] = { nombre, total: 0, niveles: [] };
-            }
+            if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
             jugadores[nombre].total += nivel.ranchopoints;
             jugadores[nombre].niveles.push(nivel);
           });
         });
 
-        // Convertir a array y ordenar por puntos
-        const ranking = Object.values(jugadores).sort((a, b) => b.total - a.total);
+        const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-        // Renderizar el ranking
         ranking.forEach(jugador => {
           const divJugador = document.createElement('div');
           divJugador.classList.add('jugador');
-
-          const h2 = document.createElement('h2');
-          h2.textContent = `${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
-          divJugador.appendChild(h2);
-
-          // Al hacer clic, mostrar sus niveles
-          divJugador.addEventListener('click', () => {
-            mostrarPerfil(jugador);
-          });
-
+          divJugador.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
+          divJugador.addEventListener('click', () => mostrarPerfil(jugador));
           panelJugadores.appendChild(divJugador);
         });
 
-        // Función para mostrar los niveles de un jugador
         function mostrarPerfil(jugador) {
-          // Eliminar perfil anterior si existe
           const perfilPrevio = document.querySelector('.perfil');
           if (perfilPrevio) perfilPrevio.remove();
 
           const perfil = document.createElement('div');
           perfil.classList.add('perfil');
-
-          const tituloPerfil = document.createElement('h2');
-          tituloPerfil.textContent = `Niveles superados por ${jugador.nombre}`;
-          perfil.appendChild(tituloPerfil);
+          perfil.innerHTML = `<h2>Niveles superados por ${jugador.nombre}</h2>`;
 
           jugador.niveles.forEach(nivel => {
-            const nivelDiv = document.createElement('div');
-            nivelDiv.classList.add('nivel');
-
             const videoIdMatch = nivel.url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
             const videoId = videoIdMatch ? videoIdMatch[1] : null;
-            const thumbUrl = videoId ? 
-              `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+
+            const nivelDiv = document.createElement('div');
+            nivelDiv.classList.add('nivel');
 
             const thumb = document.createElement('div');
             thumb.classList.add('thumb');
@@ -124,10 +98,6 @@
 
           panelJugadores.appendChild(perfil);
         }
-      })
-      .catch(err => {
-        console.error('Error cargando CSV:', err);
-        panelJugadores.innerHTML = '<p>Error al cargar los jugadores.</p>';
       });
   </script>
 </body>

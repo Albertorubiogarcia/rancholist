@@ -1,125 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Niveles</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Niveles</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Header / Barra de navegación -->
+  <!-- HEADER -->
   <header>
-    <nav class="center collapse underlined see-through">
-      <div class="nav-icon nav-nohide" style="margin-left: 20px;">
+    <nav>
+      <div class="nav-icon">
         <a href="index.html">
-          <img src="icono.png" style="height:70px" alt="Logo">
+          <img src="icono.png" alt="Logo" style="height:70px">
         </a>
+      </div>
+      <div class="nav-links">
+        <a href="lista.html" class="active">Lista de Niveles</a>
+        <a href="statsviewer.html">Stats Viewer</a>
       </div>
     </nav>
   </header>
 
-  <!-- Contenedor de niveles -->
+  <!-- CONTENIDO PRINCIPAL -->
   <div class="niveles-container">
-    <div class="panel" id="panel-niveles">
-      <!-- Los niveles se generarán aquí -->
-    </div>
+    <div class="panel" id="panel-niveles"></div>
   </div>
 
-<script>
-const panel = document.getElementById('panel-niveles');
+  <script>
+    const panel = document.getElementById('panel-niveles');
 
-// Función para obtener el ID del video de YouTube
-function getYouTubeID(url) {
-    let match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([^&\?]+)/);
-    return match ? match[1] : null;
-}
+    fetch('niveles.csv')
+      .then(r => r.text())
+      .then(csv => {
+        const lines = csv.trim().split('\n');
+        lines.shift(); // quitar cabecera
+        lines.forEach(line => {
+          const cols = line.split(';');
+          const url = cols[1];
+          const titulo = cols[2];
+          const creador = cols[3];
+          const puntos = cols[4];
 
-// Cargar CSV
-fetch('niveles.csv')
-  .then(response => {
-    if (!response.ok) throw new Error('No se pudo cargar el CSV');
-    return response.text();
-  })
-  .then(csv => {
-    const lines = csv.trim().split('\n');
-    const headers = lines.shift().split(';'); // Delimitador ';'
+          const match = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
+          const videoId = match ? match[1] : null;
+          const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
 
-    const niveles = lines.map(line => {
-      const cols = line.split(';');
-      return {
-        url: cols[0],
-        titulo: cols[1],
-        stats: {
-          Creador: cols[2],
-          Ranchopoints: cols[3]
-        }
-      };
-    });
+          const nivelDiv = document.createElement('div');
+          nivelDiv.classList.add('nivel');
 
-    niveles.forEach(nivel => {
-      const videoId = getYouTubeID(nivel.url);
+          const thumb = document.createElement('a');
+          thumb.href = url;
+          thumb.target = "_blank";
+          thumb.classList.add('thumb');
+          thumb.style.backgroundImage = `url('${thumbUrl}')`;
+          thumb.style.width = '240px';
+          thumb.style.height = '135px';
+          thumb.style.backgroundSize = 'cover';
+          thumb.style.backgroundPosition = 'center';
 
-      const nivelDiv = document.createElement('div');
-      nivelDiv.classList.add('nivel');
-      nivelDiv.style.display = 'flex';
-      nivelDiv.style.alignItems = 'center';
-      nivelDiv.style.margin = '10px 0';
-      nivelDiv.style.background = 'white';
-      nivelDiv.style.padding = '15px';
-      nivelDiv.style.borderRadius = '10px';
+          const infoDiv = document.createElement('div');
+          infoDiv.classList.add('demon-info');
+          infoDiv.innerHTML = `<h2><a href="${url}" target="_blank">${titulo}</a></h2>
+                               <p>Creador: ${creador} | Ranchopoints: ${puntos}</p>`;
 
-      // Miniatura (16:9) confiable
-      const thumb = document.createElement('a');
-      thumb.href = nivel.url;
-      thumb.target = "_blank";
-      thumb.style.display = 'block';
-      thumb.style.width = '200px';
-      thumb.style.height = `${200 * 9 / 16}px`; // 16:9 exacto
-      thumb.style.borderRadius = '10px';
-      thumb.style.flexShrink = "0";
-
-      if (videoId) {
-        // Usar hqdefault.jpg que siempre existe
-        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
-        thumb.style.backgroundSize = 'cover';
-        thumb.style.backgroundPosition = 'center';
-        thumb.style.backgroundRepeat = 'no-repeat';
-      } else {
-        thumb.style.backgroundColor = '#000';
-      }
-
-      // Info del nivel
-      const infoDiv = document.createElement('div');
-      infoDiv.style.display = 'flex';
-      infoDiv.style.flexDirection = 'column';
-      infoDiv.style.marginLeft = '20px';
-
-      const titulo = document.createElement('h2');
-      const linkTitulo = document.createElement('a');
-      linkTitulo.href = nivel.url;
-      linkTitulo.target = "_blank";
-      linkTitulo.textContent = nivel.titulo;
-      linkTitulo.style.fontSize = '1.5em';
-      titulo.appendChild(linkTitulo);
-
-      const stats = document.createElement('p');
-      stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
-
-      infoDiv.appendChild(titulo);
-      infoDiv.appendChild(stats);
-
-      nivelDiv.appendChild(thumb);
-      nivelDiv.appendChild(infoDiv);
-
-      panel.appendChild(nivelDiv);
-    });
-  })
-  .catch(err => {
-    console.error("Error cargando CSV:", err);
-    panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
-  });
-</script>
-
+          nivelDiv.appendChild(thumb);
+          nivelDiv.appendChild(infoDiv);
+          panel.appendChild(nivelDiv);
+        });
+      });
+  </script>
 </body>
 </html>
+
