@@ -20,86 +20,76 @@
 </header>
 
 <div class="niveles-container">
-  <div class="panel-niveles" id="panel-niveles">
-    <!-- Los niveles se generarán aquí -->
-  </div>
+  <div class="panel-niveles" id="panel-niveles"></div>
 </div>
 
 <script>
-  const panel = document.getElementById('panel-niveles');
+const panel = document.getElementById('panel-niveles');
 
-  // Cargar CSV desde la carpeta
-  fetch('niveles.csv')
-    .then(response => {
-      if (!response.ok) throw new Error('No se pudo cargar el CSV');
-      return response.text();
-    })
-    .then(csv => {
-      const lines = csv.trim().split('\n');
-      const headers = lines.shift().split(';'); // tu CSV usa ';'
+fetch('niveles.csv')
+  .then(response => response.text())
+  .then(csv => {
+    const lines = csv.trim().split('\n');
+    lines.shift(); // quitar cabecera
 
-      const niveles = lines.map(line => {
-        const cols = line.split(';');
-        return {
-          url: cols[0],          // URL del video
-          titulo: cols[1],       // Nombre del nivel
-          stats: {
-            Creador: cols[2],    // Creador
-            Ranchopoints: cols[3] // Puntos
-          }
-        };
-      });
-
-      niveles.forEach(nivel => {
-        const nivelDiv = document.createElement('div');
-        nivelDiv.classList.add('nivel');
-
-        // Extraer ID del video de la URL
-        let videoId = '';
-        try {
-          const urlObj = new URL(nivel.url);
-          if (urlObj.hostname.includes('youtu.be')) {
-            videoId = urlObj.pathname.slice(1); // corta la barra inicial
-          } else if (urlObj.hostname.includes('youtube.com')) {
-            videoId = urlObj.searchParams.get('v');
-          }
-        } catch(e){ console.warn('URL inválida:', nivel.url); }
-
-        // Miniatura clicable
-        const thumb = document.createElement('a');
-        thumb.href = nivel.url;
-        thumb.target = "_blank";
-        thumb.classList.add('thumb');
-        if(videoId){
-          thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
-        } else {
-          thumb.style.backgroundColor = '#ccc';
-        }
-
-        // Info del nivel
-        const infoDiv = document.createElement('div');
-        infoDiv.classList.add('demon-info');
-
-        const titulo = document.createElement('h2');
-        titulo.textContent = nivel.titulo;
-
-        const stats = document.createElement('p');
-        stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
-
-        infoDiv.appendChild(titulo);
-        infoDiv.appendChild(stats);
-
-        nivelDiv.appendChild(thumb);
-        nivelDiv.appendChild(infoDiv);
-
-        panel.appendChild(nivelDiv);
-      });
-    })
-    .catch(err => {
-      console.error("Error cargando CSV:", err);
-      panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
+    const niveles = lines.map((line, index) => {
+      const cols = line.split(';');
+      return {
+        id: index,             // identificador único para nivel.html
+        url: cols[0],
+        titulo: cols[1],
+        stats: { Creador: cols[2], Ranchopoints: cols[3] }
+      };
     });
-</script>
 
+    niveles.forEach(nivel => {
+      const nivelDiv = document.createElement('div');
+      nivelDiv.classList.add('nivel');
+
+      // Obtener ID del video
+      let videoId = '';
+      try {
+        const urlObj = new URL(nivel.url);
+        if(urlObj.hostname.includes('youtu.be')) videoId = urlObj.pathname.slice(1);
+        else if(urlObj.hostname.includes('youtube.com')) videoId = urlObj.searchParams.get('v');
+      } catch(e){ console.warn('URL inválida:', nivel.url); }
+
+      // Miniatura clicable (link al vídeo)
+      const thumb = document.createElement('a');
+      thumb.href = nivel.url;
+      thumb.target = "_blank";
+      thumb.classList.add('thumb');
+      if(videoId) thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
+      else thumb.style.backgroundColor = '#ccc';
+
+      // Info del nivel
+      const infoDiv = document.createElement('div');
+      infoDiv.classList.add('demon-info');
+
+      // Nombre del nivel → link a nivel.html?id=X
+      const titulo = document.createElement('h2');
+      const linkTitulo = document.createElement('a');
+      linkTitulo.href = `nivel.html?id=${nivel.id}`;
+      linkTitulo.textContent = nivel.titulo; // texto visible
+      titulo.appendChild(linkTitulo);
+
+      // Stats debajo del nombre
+      const stats = document.createElement('p');
+      stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+
+      infoDiv.appendChild(titulo);
+      infoDiv.appendChild(stats);
+
+      nivelDiv.appendChild(thumb);
+      nivelDiv.appendChild(infoDiv);
+
+      panel.appendChild(nivelDiv);
+    });
+  })
+  .catch(err => {
+    console.error("Error cargando CSV:", err);
+    panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
+  });
+</script>
 </body>
 </html>
