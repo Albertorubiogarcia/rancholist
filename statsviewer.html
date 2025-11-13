@@ -95,7 +95,6 @@
   </nav>
 </header>
 
-
 <div class="main-container">
   <div class="ranking" id="ranking">
     <!-- Lista de jugadores -->
@@ -108,24 +107,29 @@
 const rankingDiv = document.getElementById('ranking');
 const perfilContainer = document.getElementById('perfil-container');
 
+// Función para limpiar el título eliminando "#n - " al inicio
+function limpiarTitulo(titulo){
+  return titulo.replace(/^#\d+\s*-\s*/, '');
+}
+
 fetch('niveles.csv')
   .then(r => r.text())
   .then(csv => {
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    const niveles = lines.map(line => {
+    const niveles = lines.map((line, index) => {
       const cols = line.split(';');
       return {
         url: cols[0],
         titulo: cols[1],
         creador: cols[2],
         ranchopoints: parseFloat(cols[3]) || 0,
-        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : []
+        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [],
+        globalIndex: index + 1
       };
     });
 
-    // Crear objeto de jugadores
     const jugadores = {};
     niveles.forEach(nivel => {
       nivel.jugadores.forEach(j => {
@@ -136,81 +140,109 @@ fetch('niveles.csv')
         jugadores[nombre].niveles.push({
           titulo: nivel.titulo,
           ranchopoints: nivel.ranchopoints,
-          urlVideo
+          urlVideo,
+          globalIndex: nivel.globalIndex
         });
       });
     });
 
-    // Ordenar por puntos
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Mostrar lista de jugadores con su rank
+    // Ranking de jugadores: mostrar #n Nombre + puntos
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      divJugador.textContent = `#${index + 1} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
-      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
+      const rank = index + 1; // #n
+      divJugador.innerHTML = `#${rank} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
+      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador, rank));
       rankingDiv.appendChild(divJugador);
     });
 
-    function mostrarPerfil(jugador, divJugador) {
+    function mostrarPerfil(jugador, divJugador, rank) {
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
-      perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
+      // Mostrar ranking en el perfil también
+      perfilContainer.innerHTML = `<h2>#${rank} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      // Separar niveles por mainlist/extended/legacy
-      const mainlist = [];
-      const extended = [];
-      const legacy = [];
-      jugador.niveles.forEach((nivel, i) => {
-        if(i < 50) mainlist.push(nivel);
-        else if(i < 100) extended.push(nivel);
-        else if(i < 150) legacy.push(nivel);
-      });
-
-      function crearSeccion(titulo, lista, clase = '') {
-        const h = document.createElement('h3');
-        h.textContent = titulo;
-        h.style.fontWeight = 'bold';
-        h.style.fontSize = '1.3em';
-        h.style.marginTop = '25px';
-        perfilContainer.appendChild(h);
-
-        const div = document.createElement('div');
-        div.className = clase;
-
-        if(lista.length === 0) {
-          const span = document.createElement('span');
-          span.textContent = '';
-          div.appendChild(span);
-        } else {
-          lista.forEach((nivel, i) => {
-            const a = document.createElement('a');
-            a.href = nivel.urlVideo;
-            a.textContent = nivel.titulo;
-            a.style.textDecoration = 'none';
-            a.style.marginRight = '8px';
-            if(clase === 'mainlist') a.style.fontWeight = 'bold';
-            else if(clase === 'legacy') a.style.color = '#aaa';
-            div.appendChild(a);
-            if(i < lista.length - 1) div.appendChild(document.createTextNode(' - '));
-          });
-        }
-        perfilContainer.appendChild(div);
-      }
+      // Ordenar niveles internamente
+      jugador.niveles.sort((a,b) => a.globalIndex - b.globalIndex);
 
       // Hardest
-      const hardestNivel = jugador.niveles.sort((a,b) => a.ranchopoints - b.ranchopoints)[0];
-      if(hardestNivel) {
-        crearSeccion('Hardest', [hardestNivel], 'mainlist');
-      } else {
-        crearSeccion('Hardest', [], 'mainlist');
+      let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
+      if(hardest){
+        const hardestDiv = document.createElement('div');
+        hardestDiv.style.marginBottom = '40px';
+        const hHeading = document.createElement('h3');
+        hHeading.textContent = "Hardest";
+        hHeading.style.fontWeight = "bold";
+        hHeading.style.fontSize = "1.3em";
+        hHeading.style.marginBottom = "15px";
+        hardestDiv.appendChild(hHeading);
+
+        const p = document.createElement('p');
+        const span = document.createElement('span');
+        if(hardest.urlVideo){
+          const a = document.createElement('a');
+          a.href = hardest.urlVideo;
+          a.textContent = limpiarTitulo(hardest.titulo);
+          a.target = "_blank";
+          a.style = "font-weight:bold; color:black; text-decoration:none;";
+          span.appendChild(a);
+        } else {
+          span.textContent = limpiarTitulo(hardest.titulo);
+          span.style = "font-weight:bold; color:black;";
+        }
+        p.appendChild(span);
+        hardestDiv.appendChild(p);
+        perfilContainer.appendChild(hardestDiv);
       }
 
-      crearSeccion('Mainlist', mainlist, 'mainlist');
-      crearSeccion('Extended', extended, '');
-      crearSeccion('Legacy', legacy, 'legacy');
+      const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
+      const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
+      const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
+
+      const crearSeccion = (nivelesArray, title, estilo) => {
+        const section = document.createElement('div');
+        section.style.marginBottom = "40px";
+
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        heading.style.fontWeight = "bold";
+        heading.style.fontSize = "1.2em";
+        heading.style.marginBottom = "15px";
+        section.appendChild(heading);
+
+        const p = document.createElement('p');
+
+        nivelesArray.sort((a,b) => a.globalIndex - b.globalIndex);
+
+        nivelesArray.forEach((nivel, i) => {
+          const span = document.createElement('span');
+          if(nivel.urlVideo){
+            const a = document.createElement('a');
+            a.href = nivel.urlVideo;
+            a.textContent = limpiarTitulo(nivel.titulo);
+            a.target = "_blank";
+            a.style = estilo + "text-decoration:none;";
+            span.appendChild(a);
+          } else {
+            span.textContent = limpiarTitulo(nivel.titulo);
+            span.style = estilo;
+          }
+          p.appendChild(span);
+          if(i < nivelesArray.length - 1){
+            p.appendChild(document.createTextNode(' - '));
+          }
+        });
+
+        section.appendChild(p);
+        perfilContainer.appendChild(section);
+      };
+
+      crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
+      crearSeccion(extended, "Extended (51-100)", "color:black;");
+      crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
     }
 
     // --- Mostrar automáticamente si hay ?jugador=Nombre ---
@@ -223,17 +255,18 @@ fetch('niveles.csv')
           d.textContent.includes(jugadorEncontrado.nombre)
         );
         if (divJugador) {
-          mostrarPerfil(jugadorEncontrado, divJugador);
+          mostrarPerfil(jugadorEncontrado, divJugador, ranking.indexOf(jugadorEncontrado)+1);
           divJugador.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
       }
     }
 
-  });
+  })
+  .catch(err => console.error("Error cargando CSV:", err));
 </script>
-
 
 </body>
 </html>
+
 
 
