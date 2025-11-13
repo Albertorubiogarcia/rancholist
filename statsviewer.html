@@ -164,12 +164,13 @@ fetch('niveles.csv')
 
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Ranking de jugadores: mostrar solo nombre + puntos
+    // Ranking de jugadores: mostrar #n Nombre + puntos
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      divJugador.innerHTML = `${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
-      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador, index + 1));
+      const rank = index + 1; // #n
+      divJugador.innerHTML = `#${rank} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
+      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador, rank));
       rankingDiv.appendChild(divJugador);
     });
 
@@ -177,7 +178,7 @@ fetch('niveles.csv')
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
-      // Mostrar el rank junto al nombre en el perfil
+      // Mostrar ranking en el perfil también
       perfilContainer.innerHTML = `<h2>#${rank} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
       // Ordenar niveles internamente
@@ -187,7 +188,7 @@ fetch('niveles.csv')
       let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
       if(hardest){
         const hardestDiv = document.createElement('div');
-        hardestDiv.style.marginBottom = '40px'; // separación grande
+        hardestDiv.style.marginBottom = '40px';
         const hHeading = document.createElement('h3');
         hHeading.textContent = "Hardest";
         hHeading.style.fontWeight = "bold";
@@ -219,7 +220,7 @@ fetch('niveles.csv')
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
-        section.style.marginBottom = "40px"; // separación clara
+        section.style.marginBottom = "40px";
 
         const heading = document.createElement('h3');
         heading.textContent = title;
