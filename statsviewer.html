@@ -162,7 +162,10 @@ fetch('niveles.csv')
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      divJugador.textContent = `#${index+1} — ${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
+
+      // Formato: #1 weyi 123 pts (puntos en gris y más pequeños)
+      divJugador.innerHTML = `#${index+1} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
+
       divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
       rankingDiv.appendChild(divJugador);
     });
@@ -173,12 +176,41 @@ fetch('niveles.csv')
 
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
+      // Calcular "Hardest" (nivel más bajo que ha pasado el jugador)
+      let hardest = null;
+      if(jugador.niveles.length > 0){
+        hardest = jugador.niveles.reduce((prev, curr) => curr.globalIndex < prev.globalIndex ? curr : prev, jugador.niveles[0]);
+      }
+
+      if(hardest){
+        const hardestDiv = document.createElement('div');
+        const hHeading = document.createElement('h3');
+        hHeading.textContent = "Hardest";
+        hardestDiv.appendChild(hHeading);
+
+        const p = document.createElement('p');
+        const span = document.createElement('span');
+        if(hardest.urlVideo){
+          const a = document.createElement('a');
+          a.href = hardest.urlVideo;
+          a.textContent = hardest.titulo;
+          a.target = "_blank";
+          a.style = "font-weight:bold; color:black;";
+          span.appendChild(a);
+        } else {
+          span.textContent = hardest.titulo;
+          span.style = "font-weight:bold; color:black;";
+        }
+        p.appendChild(span);
+        hardestDiv.appendChild(p);
+        perfilContainer.appendChild(hardestDiv);
+      }
+
       const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
       const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
       const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
 
       const crearSeccion = (nivelesArray, title, estilo) => {
-        if(nivelesArray.length === 0) return;
         const section = document.createElement('div');
         const heading = document.createElement('h3');
         heading.textContent = title;
@@ -188,7 +220,7 @@ fetch('niveles.csv')
 
         nivelesArray.forEach((nivel, i) => {
           const span = document.createElement('span');
-          if(nivel.urlVideo) {
+          if(nivel.urlVideo){
             const a = document.createElement('a');
             a.href = nivel.urlVideo;
             a.textContent = nivel.titulo;
@@ -199,10 +231,8 @@ fetch('niveles.csv')
             span.textContent = nivel.titulo;
             span.style = estilo;
           }
-
           p.appendChild(span);
-
-          if(i < nivelesArray.length - 1) {
+          if(i < nivelesArray.length - 1){
             p.appendChild(document.createTextNode(' - '));
           }
         });
@@ -211,6 +241,7 @@ fetch('niveles.csv')
         perfilContainer.appendChild(section);
       };
 
+      // Siempre mostrar secciones, aunque estén vacías
       crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
       crearSeccion(extended, "Extended (51-100)", "color:black;");
       crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
@@ -218,6 +249,7 @@ fetch('niveles.csv')
   })
   .catch(err => console.error("Error cargando CSV:", err));
 </script>
+
 </body>
 </html>
 
