@@ -162,10 +162,7 @@ fetch('niveles.csv')
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-
-      // Formato: #1 weyi 123 pts (puntos en gris y más pequeños)
       divJugador.innerHTML = `#${index+1} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
-
       divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
       rankingDiv.appendChild(divJugador);
     });
@@ -176,16 +173,18 @@ fetch('niveles.csv')
 
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      // Calcular "Hardest" (nivel más bajo que ha pasado el jugador)
-      let hardest = null;
-      if(jugador.niveles.length > 0){
-        hardest = jugador.niveles.reduce((prev, curr) => curr.globalIndex < prev.globalIndex ? curr : prev, jugador.niveles[0]);
-      }
+      jugador.niveles.sort((a,b) => a.globalIndex - b.globalIndex);
 
+      // Hardest
+      let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
       if(hardest){
         const hardestDiv = document.createElement('div');
+        hardestDiv.style.marginBottom = '15px'; // separación
         const hHeading = document.createElement('h3');
         hHeading.textContent = "Hardest";
+        hHeading.style.fontWeight = "bold";
+        hHeading.style.fontSize = "1.2em";
+        hHeading.style.marginBottom = "5px";
         hardestDiv.appendChild(hHeading);
 
         const p = document.createElement('p');
@@ -195,7 +194,7 @@ fetch('niveles.csv')
           a.href = hardest.urlVideo;
           a.textContent = hardest.titulo;
           a.target = "_blank";
-          a.style = "font-weight:bold; color:black;";
+          a.style = "font-weight:bold; color:black; text-decoration:none;"; // quitar subrayado
           span.appendChild(a);
         } else {
           span.textContent = hardest.titulo;
@@ -212,11 +211,19 @@ fetch('niveles.csv')
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
+        section.style.marginBottom = "15px"; // separación entre secciones
+
         const heading = document.createElement('h3');
         heading.textContent = title;
+        heading.style.fontWeight = "bold";
+        heading.style.fontSize = "1.2em";
+        heading.style.marginBottom = "5px";
         section.appendChild(heading);
 
         const p = document.createElement('p');
+
+        // ordenar niveles por globalIndex
+        nivelesArray.sort((a,b) => a.globalIndex - b.globalIndex);
 
         nivelesArray.forEach((nivel, i) => {
           const span = document.createElement('span');
@@ -225,7 +232,7 @@ fetch('niveles.csv')
             a.href = nivel.urlVideo;
             a.textContent = nivel.titulo;
             a.target = "_blank";
-            a.style = estilo;
+            a.style = estilo + "text-decoration:none;"; // quitar subrayado
             span.appendChild(a);
           } else {
             span.textContent = nivel.titulo;
@@ -241,7 +248,6 @@ fetch('niveles.csv')
         perfilContainer.appendChild(section);
       };
 
-      // Siempre mostrar secciones, aunque estén vacías
       crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
       crearSeccion(extended, "Extended (51-100)", "color:black;");
       crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
