@@ -165,19 +165,20 @@ fetch('niveles.csv')
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
     // Ranking de jugadores: mostrar solo nombre + puntos
-    ranking.forEach(jugador => {
+    ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
       divJugador.innerHTML = `${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
-      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
+      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador, index + 1));
       rankingDiv.appendChild(divJugador);
     });
 
-    function mostrarPerfil(jugador, divJugador) {
+    function mostrarPerfil(jugador, divJugador, rank) {
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
-      perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
+      // Mostrar el rank junto al nombre en el perfil
+      perfilContainer.innerHTML = `<h2>#${rank} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
       // Ordenar niveles internamente
       jugador.niveles.sort((a,b) => a.globalIndex - b.globalIndex);
@@ -186,7 +187,7 @@ fetch('niveles.csv')
       let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
       if(hardest){
         const hardestDiv = document.createElement('div');
-        hardestDiv.style.marginBottom = '40px'; // mucho más espacio
+        hardestDiv.style.marginBottom = '40px'; // separación grande
         const hHeading = document.createElement('h3');
         hHeading.textContent = "Hardest";
         hHeading.style.fontWeight = "bold";
@@ -218,7 +219,7 @@ fetch('niveles.csv')
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
-        section.style.marginBottom = "40px"; // aumentar separación entre secciones
+        section.style.marginBottom = "40px"; // separación clara
 
         const heading = document.createElement('h3');
         heading.textContent = title;
@@ -229,7 +230,6 @@ fetch('niveles.csv')
 
         const p = document.createElement('p');
 
-        // Ordenar niveles
         nivelesArray.sort((a,b) => a.globalIndex - b.globalIndex);
 
         nivelesArray.forEach((nivel, i) => {
