@@ -199,16 +199,18 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
         perfilContainer.appendChild(hardestDiv);
       }
 
+      // --- Secciones por rango ---
       const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
       const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
       const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
+      const payolist = jugador.niveles.filter(n => n.globalIndex > 150);
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
         section.style.marginBottom = "40px";
 
         const heading = document.createElement('h3');
-        heading.textContent = title;
+        heading.textContent = `${title} (${nivelesArray.length})`;
         heading.style.fontWeight = "bold";
         heading.style.fontSize = "1.2em";
         heading.style.marginBottom = "15px";
@@ -244,6 +246,7 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
       crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
       crearSeccion(extended, "Extended (51-100)", "color:black;");
       crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
+      crearSeccion(payolist, "Payolist (151+)", "color:#888;");
     }
 
     // --- Mostrar automáticamente si hay ?jugador=Nombre ---
@@ -268,6 +271,3 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
 
 </body>
 </html>
-
-
-
