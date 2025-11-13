@@ -22,7 +22,6 @@
     </nav>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
   <div class="niveles-container">
     <div class="panel" id="panel-niveles"></div>
   </div>
@@ -35,13 +34,16 @@
       .then(csv => {
         const lines = csv.trim().split('\n');
         lines.shift(); // quitar cabecera
+
         lines.forEach(line => {
           const cols = line.split(';');
           const url = cols[1];
           const titulo = cols[2];
           const creador = cols[3];
           const puntos = cols[4];
+          const jugadores = cols[5] ? cols[5].split(',').map(j => j.trim()) : [];
 
+          // ID de video para la miniatura
           const match = url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
           const videoId = match ? match[1] : null;
           const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
@@ -49,6 +51,7 @@
           const nivelDiv = document.createElement('div');
           nivelDiv.classList.add('nivel');
 
+          // Miniatura (enlace al video)
           const thumb = document.createElement('a');
           thumb.href = url;
           thumb.target = "_blank";
@@ -59,17 +62,49 @@
           thumb.style.backgroundSize = 'cover';
           thumb.style.backgroundPosition = 'center';
 
+          // Info del nivel
           const infoDiv = document.createElement('div');
           infoDiv.classList.add('demon-info');
-          infoDiv.innerHTML = `<h2><a href="${url}" target="_blank">${titulo}</a></h2>
-                               <p>Creador: ${creador} | Ranchopoints: ${puntos}</p>`;
+
+          // Nombre del nivel como botón desplegable
+          const tituloBtn = document.createElement('button');
+          tituloBtn.textContent = titulo;
+          tituloBtn.style.fontSize = '1.3em';
+          tituloBtn.style.background = 'none';
+          tituloBtn.style.border = 'none';
+          tituloBtn.style.cursor = 'pointer';
+          tituloBtn.style.padding = '0';
+          tituloBtn.style.textAlign = 'left';
+          tituloBtn.style.color = 'var(--color-text-accent)';
+
+          // Contenedor de jugadores (inicialmente oculto)
+          const jugadoresDiv = document.createElement('div');
+          jugadoresDiv.style.display = 'none';
+          jugadoresDiv.style.marginTop = '10px';
+          jugadoresDiv.innerHTML = jugadores.length > 0 
+            ? `<strong>Jugadores que completaron este nivel:</strong><ul>${jugadores.map(j => `<li>${j}</li>`).join('')}</ul>`
+            : `<em>Nadie ha completado este nivel todavía</em>`;
+
+          // Toggle al hacer clic en el nombre
+          tituloBtn.addEventListener('click', () => {
+            jugadoresDiv.style.display = jugadoresDiv.style.display === 'none' ? 'block' : 'none';
+          });
+
+          infoDiv.appendChild(tituloBtn);
+          infoDiv.appendChild(jugadoresDiv);
 
           nivelDiv.appendChild(thumb);
           nivelDiv.appendChild(infoDiv);
+
           panel.appendChild(nivelDiv);
         });
+      })
+      .catch(err => {
+        console.error("Error cargando CSV:", err);
+        panel.innerHTML = "<p>Error al cargar los niveles. Revisa la ruta del CSV.</p>";
       });
   </script>
 </body>
 </html>
+
 
