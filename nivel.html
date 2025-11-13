@@ -150,16 +150,20 @@
 
       container.appendChild(bar);
 
-      // Lista de jugadores con links a stats y videos
+      // ===============================
+      // Lista de jugadores actualizada
+      // ===============================
       const jugadoresDiv = document.createElement('div');
       jugadoresDiv.classList.add('jugadores-list');
-      jugadoresDiv.style.background = '#88cc88'; // verde fuerte de sección
+      jugadoresDiv.style.background = 'var(--color-bg)';
+      jugadoresDiv.style.padding = '15px 20px';
+      jugadoresDiv.style.borderRadius = '10px';
+      jugadoresDiv.style.boxShadow = '0 2px 6px rgba(0,0,0,0.1)';
 
       const h3 = document.createElement('h3');
       h3.textContent = 'Putos amos';
       h3.style.marginTop = '0';
-      h3.style.padding = '10px';
-      h3.style.color = 'white';
+      h3.style.paddingBottom = '10px';
       jugadoresDiv.appendChild(h3);
 
       if(nivel.jugadores.length === 0 || (nivel.jugadores.length === 1 && nivel.jugadores[0]==='')){
@@ -168,27 +172,26 @@
         jugadoresDiv.appendChild(p);
       } else {
         nivel.jugadores.forEach((j, index) => {
+          // Espera formato: "NombreJugador|URLVideo"
           const [nombre, video] = j.split('|').map(s => s.trim());
 
           const fila = document.createElement('div');
           fila.classList.add('jugador');
           fila.style.display = 'flex';
-          fila.style.justifyContent = 'flex-start'; // junto al contenido
+          fila.style.justifyContent = 'space-between';
           fila.style.alignItems = 'center';
-          fila.style.gap = '10px'; // espacio entre nombre y video
-          fila.style.padding = '5px 10px';
-
-          // Colores intercalados
-          fila.style.background = index % 2 === 0 ? '#e6ffe6' : 'white';
+          fila.style.padding = '8px 12px';
+          fila.style.marginBottom = '6px';
           fila.style.borderRadius = '6px';
-          fila.style.marginBottom = '4px';
+          fila.style.background = '#f0f0f0'; // fondo gris web
 
           // Link al perfil del jugador
           const jugadorLink = document.createElement('a');
           jugadorLink.href = `statsviewer.html?jugador=${encodeURIComponent(nombre)}`;
           jugadorLink.textContent = nombre;
           jugadorLink.style.fontWeight = '600';
-          jugadorLink.style.color = '#074d07'; // verde oscuro
+          jugadorLink.style.color = '#074d07';
+          jugadorLink.style.marginRight = '20px'; // separación del video
 
           // Link al video del jugador
           const videoLink = document.createElement('a');
@@ -197,6 +200,7 @@
           videoLink.textContent = "Ver video";
           videoLink.style.fontSize = '0.9em';
           videoLink.style.color = '#0881c6';
+          videoLink.style.whiteSpace = 'nowrap';
 
           fila.appendChild(jugadorLink);
           fila.appendChild(videoLink);
@@ -206,7 +210,6 @@
       }
 
       container.appendChild(jugadoresDiv);
-
     })
     .catch(err => {
       console.error('Error cargando CSV:', err);
