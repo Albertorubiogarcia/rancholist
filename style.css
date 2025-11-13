@@ -1,192 +1,207 @@
-/* ===========================
+/* =========================== 
    Variables globales
 =========================== */
 :root {
-    --color-ok-bg: rgb(238, 255, 228);
-    --color-ok-border: #a8ff93;
-    --color-ok-text: #074d07;
-    --color-ok-accent: #68bf0b;
-    --color-warn-bg: #fffadd;
-    --color-warn-border: #e0e37b;
-    --color-warn-text: #4d4707;
-    --color-error-bg: #fdd;
-    --color-error-border: #ff9393;
-    --color-error-text: #4d0707;
-    --color-consider-bg: #D8EFF3;
-    --color-consider-text: #326067;
-    --color-text: #444446;
-    --color-text-accent: #222;
-    --color-border: lightgray;
-    --color-border-broken: #555;
-    --color-bg: white;
-    --color-link: blue;
-    --color-link-dark: #f77e39;
-    --color-pc-button-bg: #0881c6;
-    --color-pc-button-bg-hover: #076696;
-    --color-pc-button-bg-click: #055075;
-    --color-pc-button-text: white;
-    --color-pc-button-text-click: #eee;
-    --color-imp-button-bg: #ff003c;
-    --color-imp-button-bg-hover: #ff2457;
-    --color-imp-button-bg-click: #f21347;
-    --color-unobstrusive-button-bg: var(--color-bg);
-    --color-unobstrusive-button-bg-hover: #ddd;
-    --color-unobstrusive-button-bg-click: #aaa;
-    --color-unobstrusive-button-text: var(--color-text);
-    --color-unobstrusive-button-text-click: #111;
+  --color-ok-bg: rgb(238, 255, 228);
+  --color-ok-border: #a8ff93;
+  --color-ok-text: #074d07;
+  --color-ok-accent: #68bf0b;
+  --color-warn-bg: #fffadd;
+  --color-warn-border: #e0e37b;
+  --color-warn-text: #4d4707;
+  --color-error-bg: #fdd;
+  --color-error-border: #ff9393;
+  --color-error-text: #4d0707;
+  --color-consider-bg: #D8EFF3;
+  --color-consider-text: #326067;
+  --color-text: #444446;
+  --color-text-accent: #222;
+  --color-border: lightgray;
+  --color-bg: white;
+  --color-link: blue;
+  --color-link-dark: #f77e39;
+  --color-pc-button-bg: #0881c6;
+  --color-pc-button-bg-hover: #076696;
+  --color-pc-button-bg-click: #055075;
+  --color-pc-button-text: white;
+  --color-pc-button-text-click: #eee;
+  --color-imp-button-bg: #ff003c;
+  --color-imp-button-bg-hover: #ff2457;
+  --color-imp-button-bg-click: #f21347;
+  --color-unobstrusive-button-bg: var(--color-bg);
+  --color-unobstrusive-button-bg-hover: #ddd;
+  --color-unobstrusive-button-bg-click: #aaa;
+  --color-unobstrusive-button-text: var(--color-text);
+  --color-unobstrusive-button-text-click: #111;
 }
 
 /* ===========================
-   Body y texto base
+   Base
 =========================== */
 body {
-    font-family: "Montserrat", sans-serif;
-    color: var(--color-text);
-    background-color: #f0f0f0;
-    text-align: center;
-    position: relative;
-    min-width: 100%;
-    height: 100%;
-    margin-top: 70px; /* espacio para header fijo */
-}
-
-h1 {
-    color: #3333cc;
-}
-
-h2 {
-    font-size: 2em; /* nombre del nivel más grande */
-    margin: 0.5em 0;
-    text-align: left;
-}
-
-a {
-    color: var(--color-text-accent);
-    text-decoration: none;
-    cursor: pointer;
-}
-
-a:hover {
-    text-decoration: underline;
+  font-family: "Montserrat", sans-serif;
+  color: var(--color-text);
+  background-color: #f0f0f0;
+  text-align: center;
+  position: relative;
+  min-width: 100%;
+  height: 100%;
+  margin-top: 70px;
 }
 
 /* ===========================
-   Botones
-=========================== */
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-/* ===========================
-   Header y navegación
+   Header
 =========================== */
 header nav {
-    width: 100%;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* separa logo de navegación */
-    padding: 0 400px; /* margen lateral */
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-    background: var(--color-bg);
-    font-size: 1.2em;
-    font-weight: 600;
+  width: 100%;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 400px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background: var(--color-bg);
+  font-size: 1.2em;
+  font-weight: 600;
 }
 
-
 /* ===========================
-   Contenedores y paneles
+   Sección de niveles
 =========================== */
 .niveles-container {
-    display: flex;
-    justify-content: center;
-    padding: 0 200px; /* espacio lateral amplio */
-    box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 0 200px;
 }
 
-.niveles {
-    width: 100%;
-    max-width: 1000px;
+.panel-niveles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 700px;
+  margin: 20px auto;
+  background: transparent;
 }
 
-.panel {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;         /* espacio entre niveles */
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 700px;
-    margin: 20px auto;
-    background: transparent; /* quitamos fondo blanco del panel */
-}
-
-
-
-/* ===========================
-   Cada nivel
-=========================== */
 .nivel {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 15px;
-    width: 100%;
-    max-width: 600px;
-    margin: 10px 0;            /* separación vertical entre niveles */
-    padding: 15px;              /* espacio interno del nivel */
-    background: var(--color-bg); /* fondo blanco solo de este nivel */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* opcional: da relieve */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 600px;
+  margin: 10px 0;
+  padding: 15px;
+  background: var(--color-bg);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-
-.demon-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-}
-
-/* ===========================
-   Miniatura
-=========================== */
 .thumb {
-    width: 200px;
-    height: 116px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 10px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 200px;
+  height: 112px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .thumb:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.demon-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+/* ===========================
+   Sección de jugadores
+=========================== */
+.jugadores-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 200px;
+}
+
+.panel-jugadores {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  text-align: left;
+}
+
+.jugador {
+  background: white;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin: 10px 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.jugador:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.jugador h2 {
+  margin: 0;
+  font-size: 1.3em;
+  color: #222;
+}
+
+.perfil {
+  margin-top: 30px;
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.perfil .nivel {
+  background: #fafafa;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.perfil .thumb {
+  width: 160px;
+  height: 90px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
 }
 
 /* ===========================
    Responsive
 =========================== */
 @media (max-width: 1200px) {
-    .niveles-container {
-        padding: 0 100px;
-    }
+  .niveles-container,
+  .jugadores-container {
+    padding: 0 100px;
+  }
 }
 
 @media (max-width: 768px) {
-    .niveles-container {
-        padding: 0 20px;
-    }
-    .nivel {
-        flex-direction: column; /* miniatura arriba en móviles */
-        align-items: center;
-    }
-    h2 {
-        text-align: center;
-    }
+  .niveles-container,
+  .jugadores-container {
+    padding: 0 20px;
+  }
+  .nivel {
+    flex-direction: column;
+    align-items: center;
+  }
+  h2 {
+    text-align: center;
+  }
 }
