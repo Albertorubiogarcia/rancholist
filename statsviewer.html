@@ -24,7 +24,7 @@
 
   <div class="jugadores-container">
     <div class="panel-jugadores" id="panel-jugadores">
-      <h1>Ranking de putos amos</h1>
+      <h1>Ranking de Jugadores</h1>
     </div>
   </div>
 
@@ -40,11 +40,11 @@
         const niveles = lines.map(line => {
           const cols = line.split(';');
           return {
-            url: cols[1],
-            titulo: cols[2],
-            creador: cols[3],
-            ranchopoints: parseFloat(cols[4]) || 0,
-            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [] // <-- vamos a ajustar
+            url: cols[0],
+            titulo: cols[1],
+            creador: cols[2],
+            ranchopoints: parseFloat(cols[3]) || 0,  // <-- ahora correcto
+            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : []
           };
         });
 
@@ -52,14 +52,16 @@
         const jugadores = {};
 
         niveles.forEach(nivel => {
-          // Si la columna de jugadores no está vacía
           if (nivel.jugadores.length > 0 && nivel.jugadores[0] !== "") {
             nivel.jugadores.forEach(j => {
-              // Separar nombre y url de video
-              const [nombre, video] = j.split('|').map(s => s.trim());
+              const [nombre, urlVideo] = j.split('|').map(s => s.trim());
               if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
-              jugadores[nombre].total += nivel.ranchopoints;
-              jugadores[nombre].niveles.push({ titulo: nivel.titulo, ranchopoints: nivel.ranchopoints, urlVideo: video });
+              jugadores[nombre].total += nivel.ranchopoints;  // <-- suma correcta
+              jugadores[nombre].niveles.push({
+                titulo: nivel.titulo,
+                ranchopoints: nivel.ranchopoints,
+                urlVideo
+              });
             });
           }
         });
@@ -91,7 +93,6 @@
             const thumb = document.createElement('div');
             thumb.classList.add('thumb');
 
-            // Imagen de miniatura de YouTube desde urlVideo
             let videoId = null;
             try {
               const urlObj = new URL(nivel.urlVideo);
@@ -119,5 +120,6 @@
   </script>
 </body>
 </html>
+
 
 
