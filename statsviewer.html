@@ -5,96 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stats Viewer</title>
 <link rel="stylesheet" href="style.css">
-<style>
-
-  .main-container {
-    display: flex;
-    flex: 1;
-    height: calc(100vh - 70px);
-  }
-
-  .ranking {
-    width: 250px;
-    overflow-y: auto;
-    background: white;
-    border-right: 1px solid #ddd;
-    padding: 10px;
-  }
-
-  .ranking .jugador {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-  }
-
-  .ranking .jugador:hover,
-  .ranking .jugador.active {
-    background-color: #e0f7e0;
-  }
-
-  .perfil-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    background: #fff;
-  }
-
-  .perfil-container h2 {
-    margin-top: 0;
-  }
-
-  .nivel {
-    display: flex;
-    margin: 10px 0;
-    padding: 10px;
-    background: #fafafa;
-    border-radius: 8px;
-    align-items: center;
-  }
-
-  .thumb {
-    width: 120px;
-    height: 68px;
-    background-size: cover;
-    background-position: center;
-    border-radius: 6px;
-    margin-right: 15px;
-    flex-shrink: 0;
-  }
-
-  .demon-info {
-    flex: 1;
-  }
-
-  @media (max-width: 768px) {
-    .main-container {
-      flex-direction: column;
-    }
-    .ranking {
-      width: 100%;
-      height: 200px;
-      border-right: none;
-      border-bottom: 1px solid #ddd;
-    }
-  }
-</style>
 </head>
 <body>
 
 <header>
   <nav>
     <div class="nav-left">
-      <!-- Logo -->
-      <a href="index.html" class="logo-link">
-        <img src="icono.png" alt="Logo" class="logo-img">
-      </a>
-      <!-- Enlaces -->
+      <a href="index.html" class="logo-link"><img src="icono.png" alt="Logo" class="logo-img"></a>
       <a href="lista.html" class="nav-item">RANCHOLIST</a>
       <a href="statsviewer.html" class="nav-item">STATSVIEWER</a>
     </div>
   </nav>
 </header>
-
 
 <div class="main-container">
   <div class="ranking" id="ranking">
@@ -104,14 +26,10 @@
     <h2>Selecciona un jugador para ver su perfil</h2>
   </div>
 </div>
+
 <script>
 const rankingDiv = document.getElementById('ranking');
 const perfilContainer = document.getElementById('perfil-container');
-
-// Función para limpiar el título eliminando "#n - " al inicio
-function limpiarTitulo(titulo){
-  return titulo.replace(/^#\d+\s*-\s*/, '');
-}
 
 fetch('niveles.csv')
   .then(r => r.text())
@@ -119,18 +37,18 @@ fetch('niveles.csv')
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    const niveles = lines.map((line, index) => {
+    const niveles = lines.map(line => {
       const cols = line.split(';');
       return {
         url: cols[0],
         titulo: cols[1],
         creador: cols[2],
         ranchopoints: parseFloat(cols[3]) || 0,
-        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [],
-        globalIndex: index + 1
+        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : []
       };
     });
 
+    // Crear objeto de jugadores
     const jugadores = {};
     niveles.forEach(nivel => {
       nivel.jugadores.forEach(j => {
@@ -141,112 +59,100 @@ fetch('niveles.csv')
         jugadores[nombre].niveles.push({
           titulo: nivel.titulo,
           ranchopoints: nivel.ranchopoints,
-          urlVideo,
-          globalIndex: nivel.globalIndex
+          urlVideo
         });
       });
     });
 
+    // Ordenar por puntos
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Ranking de jugadores: mostrar #n Nombre + puntos
+    // Mostrar lista de jugadores con su rank
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
-      const rank = index + 1; // #n
-      divJugador.innerHTML = `#${rank} ${jugador.nombre} <span style="font-size:0.85em; color:gray;">${jugador.total.toFixed(2)} pts</span>`;
-      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador, rank));
+      divJugador.textContent = `#${index + 1} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts`;
+      divJugador.addEventListener('click', () => mostrarPerfil(jugador, divJugador));
       rankingDiv.appendChild(divJugador);
     });
 
-    function mostrarPerfil(jugador, divJugador, rank) {
+    function mostrarPerfil(jugador, divJugador) {
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
-      // Mostrar ranking en el perfil también
-      perfilContainer.innerHTML = `<h2>#${rank} ${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
+      perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      // Ordenar niveles internamente
-      jugador.niveles.sort((a,b) => a.globalIndex - b.globalIndex);
+      // Separar niveles por mainlist/extended/legacy
+      const mainlist = [];
+      const extended = [];
+      const legacy = [];
+      jugador.niveles.forEach((nivel, i) => {
+        if(i < 50) mainlist.push(nivel);
+        else if(i < 100) extended.push(nivel);
+        else if(i < 150) legacy.push(nivel);
+      });
 
-      // Hardest
-      let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
-      if(hardest){
-        const hardestDiv = document.createElement('div');
-        hardestDiv.style.marginBottom = '40px';
-        const hHeading = document.createElement('h3');
-        hHeading.textContent = "Hardest";
-        hHeading.style.fontWeight = "bold";
-        hHeading.style.fontSize = "1.3em";
-        hHeading.style.marginBottom = "15px";
-        hardestDiv.appendChild(hHeading);
+      function crearSeccion(titulo, lista, clase = '') {
+        const h = document.createElement('h3');
+        h.textContent = titulo;
+        h.style.fontWeight = 'bold';
+        h.style.fontSize = '1.3em';
+        h.style.marginTop = '25px';
+        perfilContainer.appendChild(h);
 
-        const p = document.createElement('p');
-        const span = document.createElement('span');
-        if(hardest.urlVideo){
-          const a = document.createElement('a');
-          a.href = hardest.urlVideo;
-          a.textContent = limpiarTitulo(hardest.titulo);
-          a.target = "_blank";
-          a.style = "font-weight:bold; color:black; text-decoration:none;";
-          span.appendChild(a);
-        } else {
-          span.textContent = limpiarTitulo(hardest.titulo);
-          span.style = "font-weight:bold; color:black;";
-        }
-        p.appendChild(span);
-        hardestDiv.appendChild(p);
-        perfilContainer.appendChild(hardestDiv);
-      }
+        const div = document.createElement('div');
+        div.className = clase;
 
-      const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
-      const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
-      const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
-
-      const crearSeccion = (nivelesArray, title, estilo) => {
-        const section = document.createElement('div');
-        section.style.marginBottom = "40px";
-
-        const heading = document.createElement('h3');
-        heading.textContent = title;
-        heading.style.fontWeight = "bold";
-        heading.style.fontSize = "1.2em";
-        heading.style.marginBottom = "15px";
-        section.appendChild(heading);
-
-        const p = document.createElement('p');
-
-        nivelesArray.sort((a,b) => a.globalIndex - b.globalIndex);
-
-        nivelesArray.forEach((nivel, i) => {
+        if(lista.length === 0) {
           const span = document.createElement('span');
-          if(nivel.urlVideo){
+          span.textContent = '';
+          div.appendChild(span);
+        } else {
+          lista.forEach((nivel, i) => {
             const a = document.createElement('a');
             a.href = nivel.urlVideo;
-            a.textContent = limpiarTitulo(nivel.titulo);
-            a.target = "_blank";
-            a.style = estilo + "text-decoration:none;";
-            span.appendChild(a);
-          } else {
-            span.textContent = limpiarTitulo(nivel.titulo);
-            span.style = estilo;
-          }
-          p.appendChild(span);
-          if(i < nivelesArray.length - 1){
-            p.appendChild(document.createTextNode(' - '));
-          }
-        });
+            a.textContent = nivel.titulo;
+            a.style.textDecoration = 'none';
+            a.style.marginRight = '8px';
+            if(clase === 'mainlist') a.style.fontWeight = 'bold';
+            else if(clase === 'legacy') a.style.color = '#aaa';
+            div.appendChild(a);
+            if(i < lista.length - 1) div.appendChild(document.createTextNode(' - '));
+          });
+        }
+        perfilContainer.appendChild(div);
+      }
 
-        section.appendChild(p);
-        perfilContainer.appendChild(section);
-      };
+      // Hardest
+      const hardestNivel = jugador.niveles.sort((a,b) => a.ranchopoints - b.ranchopoints)[0];
+      if(hardestNivel) {
+        crearSeccion('Hardest', [hardestNivel], 'mainlist');
+      } else {
+        crearSeccion('Hardest', [], 'mainlist');
+      }
 
-      crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
-      crearSeccion(extended, "Extended (51-100)", "color:black;");
-      crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
+      crearSeccion('Mainlist', mainlist, 'mainlist');
+      crearSeccion('Extended', extended, '');
+      crearSeccion('Legacy', legacy, 'legacy');
     }
-  })
-  .catch(err => console.error("Error cargando CSV:", err));
+
+    // --- Mostrar automáticamente si hay ?jugador=Nombre ---
+    const params = new URLSearchParams(window.location.search);
+    const jugadorURL = params.get('jugador');
+    if (jugadorURL) {
+      const jugadorEncontrado = ranking.find(j => j.nombre === jugadorURL);
+      if (jugadorEncontrado) {
+        const divJugador = Array.from(rankingDiv.children).find(d =>
+          d.textContent.includes(jugadorEncontrado.nombre)
+        );
+        if (divJugador) {
+          mostrarPerfil(jugadorEncontrado, divJugador);
+          divJugador.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+
+  });
 </script>
 
 </body>
