@@ -37,7 +37,6 @@
         const lines = csv.trim().split('\n');
         lines.shift(); // eliminar cabecera
 
-        // Convertir líneas a objetos de niveles
         const niveles = lines.map(line => {
           const cols = line.split(';');
           return {
@@ -45,20 +44,18 @@
             titulo: cols[2],
             creador: cols[3],
             ranchopoints: parseFloat(cols[4]) || 0,
-            jugadores: cols[5] ? cols[5].split(',').map(j => j.trim()) : []
+            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [] // CORREGIDO: columna 5
           };
         });
 
-        // Depuración: ver qué jugadores se están cargando
         console.log("Niveles cargados:", niveles);
 
-        // Construir objeto de jugadores
         const jugadores = {};
         niveles.forEach(nivel => {
           nivel.jugadores.forEach(j => {
-            // Separar nombre y URL si está en formato jugador|url
+            if (!j) return;
             let [nombre, videoUrl] = j.split('|').map(s => s.trim());
-            if (!nombre) return; // ignorar entradas vacías
+            if (!nombre) return;
 
             if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
             jugadores[nombre].total += nivel.ranchopoints;
@@ -66,12 +63,10 @@
           });
         });
 
-        // Crear ranking ordenado por puntos
         const ranking = Object.values(jugadores)
-          .filter(j => j.nombre !== '') // eliminar jugadores vacíos
+          .filter(j => j.nombre !== '')
           .sort((a,b) => b.total - a.total);
 
-        // Mostrar lista de jugadores
         ranking.forEach(jugador => {
           const divJugador = document.createElement('div');
           divJugador.classList.add('jugador');
@@ -80,7 +75,6 @@
           panelJugadores.appendChild(divJugador);
         });
 
-        // Función para mostrar perfil
         function mostrarPerfil(jugador) {
           const perfilPrevio = document.querySelector('.perfil');
           if (perfilPrevio) perfilPrevio.remove();
