@@ -112,7 +112,7 @@ function limpiarTitulo(titulo){
   return titulo.replace(/^#\d+\s*-\s*/, '');
 }
 
-fetch('niveles.csv')
+fetch('niveles.csv?nocache=' + new Date().getTime())
   .then(r => r.text())
   .then(csv => {
     const lines = csv.trim().split('\n');
