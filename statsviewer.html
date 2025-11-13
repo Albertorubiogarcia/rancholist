@@ -28,88 +28,102 @@
     </div>
   </div>
 
-  <script>
-    const panelJugadores = document.getElementById('panel-jugadores');
+<script>
+const panelJugadores = document.getElementById('panel-jugadores');
 
-    fetch('niveles.csv')
-      .then(r => r.text())
-      .then(csv => {
-        const lines = csv.trim().split('\n');
-        lines.shift(); // eliminar cabecera
+fetch('niveles.csv')
+  .then(r => r.text())
+  .then(csv => {
+    const lines = csv.trim().split('\n');
+    lines.shift(); // quitar cabecera
 
-        // Mapear niveles con las columnas correctas
-        const niveles = lines.map(line => {
-          const cols = line.split(';');
-          return {
-            url: cols[0],
-            titulo: cols[1],
-            creador: cols[2],
-            ranchopoints: parseFloat(cols[3]) || 0,
-            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : []
-          };
+    const niveles = lines.map(line => {
+      const cols = line.split(';');
+      return {
+        url: cols[0],
+        titulo: cols[1],
+        creador: cols[2],
+        ranchopoints: parseFloat(cols[3]) || 0,
+        jugadores: cols[4] ? cols[4].split(',').map(j => {
+          const [nombre, videoUrl] = j.split('|').map(s => s.trim());
+          return { nombre, videoUrl };
+        }) : []
+      };
+    });
+
+    const jugadoresMap = {};
+
+    // Construir jugadores con puntos y niveles
+    niveles.forEach(nivel => {
+      nivel.jugadores.forEach(j => {
+        if (!jugadoresMap[j.nombre]) {
+          jugadoresMap[j.nombre] = { nombre: j.nombre, total: 0, niveles: [] };
+        }
+        jugadoresMap[j.nombre].total += nivel.ranchopoints;
+        jugadoresMap[j.nombre].niveles.push({ 
+          titulo: nivel.titulo, 
+          ranchopoints: nivel.ranchopoints, 
+          videoUrl: j.videoUrl 
         });
+      });
+    });
 
-        // Crear objeto de jugadores agregando sus puntos y niveles
-        const jugadores = {};
-        niveles.forEach(nivel => {
-          nivel.jugadores.forEach(nombre => {
-            if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
-            jugadores[nombre].total += nivel.ranchopoints;
-            jugadores[nombre].niveles.push(nivel);
-          });
-        });
+    // Convertir a array y ordenar por puntos
+    const ranking = Object.values(jugadoresMap).sort((a,b) => b.total - a.total);
 
-        // Ordenar por puntos
-        const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
+    ranking.forEach(jugador => {
+      const divJugador = document.createElement('div');
+      divJugador.classList.add('jugador');
+      divJugador.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
+      divJugador.addEventListener('click', () => mostrarPerfil(jugador));
+      panelJugadores.appendChild(divJugador);
+    });
 
-        // Mostrar lista de jugadores
-        ranking.forEach(jugador => {
-          const divJugador = document.createElement('div');
-          divJugador.classList.add('jugador');
-          divJugador.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
-          divJugador.addEventListener('click', () => mostrarPerfil(jugador));
-          panelJugadores.appendChild(divJugador);
-        });
+    function mostrarPerfil(jugador) {
+      const perfilPrevio = document.querySelector('.perfil');
+      if (perfilPrevio) perfilPrevio.remove();
 
-        // Función para mostrar el perfil del jugador
-        function mostrarPerfil(jugador) {
-          const perfilPrevio = document.querySelector('.perfil');
-          if (perfilPrevio) perfilPrevio.remove();
+      const perfil = document.createElement('div');
+      perfil.classList.add('perfil');
+      perfil.innerHTML = `<h2>Niveles superados por ${jugador.nombre}</h2>`;
 
-          const perfil = document.createElement('div');
-          perfil.classList.add('perfil');
-          perfil.innerHTML = `<h2>Niveles superados por ${jugador.nombre}</h2>`;
+      jugador.niveles.forEach(nivel => {
+        const nivelDiv = document.createElement('div');
+        nivelDiv.classList.add('nivel');
 
-          jugador.niveles.forEach(nivel => {
-            const videoIdMatch = nivel.url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
-            const videoId = videoIdMatch ? videoIdMatch[1] : null;
-            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
+        const thumb = document.createElement('div');
+        thumb.classList.add('thumb');
 
-            const nivelDiv = document.createElement('div');
-            nivelDiv.classList.add('nivel');
+        // Extraer ID de YouTube del video del jugador
+        let videoId = '';
+        try {
+          const urlObj = new URL(nivel.videoUrl);
+          if(urlObj.hostname.includes('youtu.be')) videoId = urlObj.pathname.slice(1);
+          else if(urlObj.hostname.includes('youtube.com')) videoId = urlObj.searchParams.get('v');
+        } catch(e){ console.warn('URL inválida:', nivel.videoUrl); }
 
-            const thumb = document.createElement('div');
-            thumb.classList.add('thumb');
-            if(thumbUrl) thumb.style.backgroundImage = `url('${thumbUrl}')`;
-
-            const info = document.createElement('div');
-            info.classList.add('demon-info');
-            info.innerHTML = `<strong>${nivel.titulo}</strong><br>Ranchopoints: ${nivel.ranchopoints}<br>Creador: ${nivel.creador}`;
-
-            nivelDiv.appendChild(thumb);
-            nivelDiv.appendChild(info);
-            perfil.appendChild(nivelDiv);
-          });
-
-          panelJugadores.appendChild(perfil);
+        if(videoId) {
+          thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
         }
 
-      })
-      .catch(err => {
-        console.error('Error cargando CSV:', err);
-        panelJugadores.innerHTML = "<p>Error al cargar los datos de los jugadores.</p>";
+        const info = document.createElement('div');
+        info.classList.add('demon-info');
+        info.innerHTML = `<strong>${nivel.titulo}</strong><br>Ranchopoints: ${nivel.ranchopoints}<br>
+          <a href="${nivel.videoUrl}" target="_blank">Ver video</a>`;
+
+        nivelDiv.appendChild(thumb);
+        nivelDiv.appendChild(info);
+        perfil.appendChild(nivelDiv);
       });
-  </script>
+
+      panelJugadores.appendChild(perfil);
+    }
+  })
+  .catch(err => {
+    console.error('Error cargando CSV:', err);
+    panelJugadores.innerHTML = "<p>Error al cargar los datos.</p>";
+  });
+</script>
 </body>
 </html>
 
