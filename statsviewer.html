@@ -119,7 +119,6 @@
     <h2>Selecciona un jugador para ver su perfil</h2>
   </div>
 </div>
-
 <script>
 const rankingDiv = document.getElementById('ranking');
 const perfilContainer = document.getElementById('perfil-container');
@@ -130,14 +129,16 @@ fetch('niveles.csv')
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    const niveles = lines.map(line => {
+    // Crear array de niveles con índice global
+    const niveles = lines.map((line, index) => {
       const cols = line.split(';');
       return {
         url: cols[0],
         titulo: cols[1],
         creador: cols[2],
         ranchopoints: parseFloat(cols[3]) || 0,
-        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : []
+        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [],
+        globalIndex: index + 1 // índice global 1-150
       };
     });
 
@@ -152,7 +153,8 @@ fetch('niveles.csv')
         jugadores[nombre].niveles.push({
           titulo: nivel.titulo,
           ranchopoints: nivel.ranchopoints,
-          urlVideo
+          urlVideo,
+          globalIndex: nivel.globalIndex
         });
       });
     });
@@ -177,10 +179,10 @@ fetch('niveles.csv')
       // Limpiar perfil
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      // Categorías
-      const mainlist = jugador.niveles.slice(0,50);
-      const extended = jugador.niveles.slice(50,100);
-      const legacy = jugador.niveles.slice(100,150);
+      // Separar niveles según globalIndex
+      const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
+      const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
+      const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
 
       const crearLista = (nivelesArray, title) => {
         if(nivelesArray.length === 0) return;
@@ -212,8 +214,10 @@ fetch('niveles.csv')
       crearLista(extended, "Extended (51-100)");
       crearLista(legacy, "Legacy (101-150)");
     }
-  });
+  })
+  .catch(err => console.error("Error cargando CSV:", err));
 </script>
+
 </body>
 </html>
 
