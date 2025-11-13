@@ -35,7 +35,7 @@
       .then(r => r.text())
       .then(csv => {
         const lines = csv.trim().split('\n');
-        lines.shift(); // eliminar cabecera
+        lines.shift(); // quitar cabecera
 
         const niveles = lines.map(line => {
           const cols = line.split(';');
@@ -44,29 +44,30 @@
             titulo: cols[2],
             creador: cols[3],
             ranchopoints: parseFloat(cols[4]) || 0,
-            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [] // CORREGIDO: columna 5
+            jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [] // <-- vamos a ajustar
           };
         });
 
-        console.log("Niveles cargados:", niveles);
-
+        // Crear objeto de jugadores
         const jugadores = {};
-        niveles.forEach(nivel => {
-          nivel.jugadores.forEach(j => {
-            if (!j) return;
-            let [nombre, videoUrl] = j.split('|').map(s => s.trim());
-            if (!nombre) return;
 
-            if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
-            jugadores[nombre].total += nivel.ranchopoints;
-            jugadores[nombre].niveles.push({ ...nivel, videoUrl });
-          });
+        niveles.forEach(nivel => {
+          // Si la columna de jugadores no está vacía
+          if (nivel.jugadores.length > 0 && nivel.jugadores[0] !== "") {
+            nivel.jugadores.forEach(j => {
+              // Separar nombre y url de video
+              const [nombre, video] = j.split('|').map(s => s.trim());
+              if (!jugadores[nombre]) jugadores[nombre] = { nombre, total: 0, niveles: [] };
+              jugadores[nombre].total += nivel.ranchopoints;
+              jugadores[nombre].niveles.push({ titulo: nivel.titulo, ranchopoints: nivel.ranchopoints, urlVideo: video });
+            });
+          }
         });
 
-        const ranking = Object.values(jugadores)
-          .filter(j => j.nombre !== '')
-          .sort((a,b) => b.total - a.total);
+        // Ordenar por puntos
+        const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
+        // Mostrar ranking
         ranking.forEach(jugador => {
           const divJugador = document.createElement('div');
           divJugador.classList.add('jugador');
@@ -84,23 +85,27 @@
           perfil.innerHTML = `<h2>Niveles superados por ${jugador.nombre}</h2>`;
 
           jugador.niveles.forEach(nivel => {
-            const videoIdMatch = nivel.url.match(/(?:youtu\.be\/|v=)([\w-]+)/);
-            const videoId = videoIdMatch ? videoIdMatch[1] : null;
-            const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '';
-
             const nivelDiv = document.createElement('div');
             nivelDiv.classList.add('nivel');
 
             const thumb = document.createElement('div');
             thumb.classList.add('thumb');
-            thumb.style.backgroundImage = `url('${thumbUrl}')`;
+
+            // Imagen de miniatura de YouTube desde urlVideo
+            let videoId = null;
+            try {
+              const urlObj = new URL(nivel.urlVideo);
+              if (urlObj.hostname.includes('youtu.be')) videoId = urlObj.pathname.slice(1);
+              else if (urlObj.hostname.includes('youtube.com')) videoId = urlObj.searchParams.get('v');
+            } catch(e){ console.warn('URL inválida:', nivel.urlVideo); }
+
+            if(videoId) {
+              thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg')`;
+            }
 
             const info = document.createElement('div');
             info.classList.add('demon-info');
             info.innerHTML = `<strong>${nivel.titulo}</strong><br>Ranchopoints: ${nivel.ranchopoints}`;
-            if (nivel.videoUrl) {
-              info.innerHTML += `<br><a href="${nivel.videoUrl}" target="_blank">Video del jugador</a>`;
-            }
 
             nivelDiv.appendChild(thumb);
             nivelDiv.appendChild(info);
@@ -109,10 +114,7 @@
 
           panelJugadores.appendChild(perfil);
         }
-      })
-      .catch(err => {
-        console.error('Error cargando CSV:', err);
-        panelJugadores.innerHTML = "<p>Error al cargar los datos de los jugadores.</p>";
+
       });
   </script>
 </body>
