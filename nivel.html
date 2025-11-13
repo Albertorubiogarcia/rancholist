@@ -150,7 +150,7 @@
 
       container.appendChild(bar);
 
-      // Lista de jugadores
+      // Lista de jugadores con links a stats y videos
       const jugadoresDiv = document.createElement('div');
       jugadoresDiv.classList.add('jugadores-list');
 
@@ -164,10 +164,34 @@
         jugadoresDiv.appendChild(p);
       } else {
         nivel.jugadores.forEach(j => {
-          const div = document.createElement('div');
-          div.classList.add('jugador');
-          div.textContent = j;
-          jugadoresDiv.appendChild(div);
+          // Separar nombre y video del jugador (formato CSV: Nombre|URLVideo)
+          const [nombre, video] = j.split('|').map(s => s.trim());
+
+          const fila = document.createElement('div');
+          fila.classList.add('jugador');
+          fila.style.display = 'flex';
+          fila.style.justifyContent = 'space-between';
+          fila.style.alignItems = 'center';
+
+          // Link al perfil del jugador
+          const jugadorLink = document.createElement('a');
+          jugadorLink.href = `statsviewer.html?jugador=${encodeURIComponent(nombre)}`;
+          jugadorLink.textContent = nombre;
+          jugadorLink.style.fontWeight = '600';
+
+          // Link al video del jugador
+          const videoLink = document.createElement('a');
+          videoLink.href = video;
+          videoLink.target = "_blank";
+          videoLink.textContent = "Ver video";
+          videoLink.style.marginLeft = "10px";
+          videoLink.style.fontSize = '0.9em';
+          videoLink.style.color = '#0881c6';
+
+          fila.appendChild(jugadorLink);
+          fila.appendChild(videoLink);
+
+          jugadoresDiv.appendChild(fila);
         });
       }
 
@@ -179,6 +203,5 @@
       container.innerHTML = "<p>Error al cargar los datos del nivel.</p>";
     });
 </script>
-
 </body>
 </html>
