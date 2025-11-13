@@ -129,7 +129,6 @@ fetch('niveles.csv')
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    // Crear array de niveles con índice global
     const niveles = lines.map((line, index) => {
       const cols = line.split(';');
       return {
@@ -138,11 +137,10 @@ fetch('niveles.csv')
         creador: cols[2],
         ranchopoints: parseFloat(cols[3]) || 0,
         jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [],
-        globalIndex: index + 1 // índice global 1-150
+        globalIndex: index + 1
       };
     });
 
-    // Crear objeto de jugadores
     const jugadores = {};
     niveles.forEach(nivel => {
       nivel.jugadores.forEach(j => {
@@ -159,10 +157,8 @@ fetch('niveles.csv')
       });
     });
 
-    // Ordenar jugadores por puntos
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
-    // Mostrar lista de jugadores con ranking numérico
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
@@ -172,52 +168,56 @@ fetch('niveles.csv')
     });
 
     function mostrarPerfil(jugador, divJugador) {
-      // Quitar activo anterior
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
-      // Limpiar perfil
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
-      // Separar niveles según globalIndex
       const mainlist = jugador.niveles.filter(n => n.globalIndex <= 50);
       const extended = jugador.niveles.filter(n => n.globalIndex > 50 && n.globalIndex <= 100);
       const legacy = jugador.niveles.filter(n => n.globalIndex > 100 && n.globalIndex <= 150);
 
-      const crearLista = (nivelesArray, title) => {
+      const crearSeccion = (nivelesArray, title, estilo) => {
         if(nivelesArray.length === 0) return;
         const section = document.createElement('div');
         const heading = document.createElement('h3');
         heading.textContent = title;
         section.appendChild(heading);
 
-        const ul = document.createElement('ul');
-        nivelesArray.forEach(nivel => {
-          const li = document.createElement('li');
+        const p = document.createElement('p');
+
+        nivelesArray.forEach((nivel, i) => {
+          const span = document.createElement('span');
           if(nivel.urlVideo) {
             const a = document.createElement('a');
             a.href = nivel.urlVideo;
             a.textContent = nivel.titulo;
             a.target = "_blank";
-            li.appendChild(a);
+            a.style = estilo;
+            span.appendChild(a);
           } else {
-            li.textContent = nivel.titulo;
+            span.textContent = nivel.titulo;
+            span.style = estilo;
           }
-          ul.appendChild(li);
+
+          p.appendChild(span);
+
+          if(i < nivelesArray.length - 1) {
+            p.appendChild(document.createTextNode(' - '));
+          }
         });
 
-        section.appendChild(ul);
+        section.appendChild(p);
         perfilContainer.appendChild(section);
       };
 
-      crearLista(mainlist, "Mainlist (1-50)");
-      crearLista(extended, "Extended (51-100)");
-      crearLista(legacy, "Legacy (101-150)");
+      crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
+      crearSeccion(extended, "Extended (51-100)", "color:black;");
+      crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
     }
   })
   .catch(err => console.error("Error cargando CSV:", err));
 </script>
-
 </body>
 </html>
 
