@@ -54,9 +54,8 @@ header nav {
   width: 100%;
   height: 70px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 40px;
+  padding-left: 60px; /* margen amplio a la izquierda */
   position: fixed;
   top: 0;
   left: 0;
@@ -65,17 +64,37 @@ header nav {
   font-size: 1.2em;
   font-weight: 600;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  justify-content: flex-start; /* todo a la izquierda */
 }
 
-header nav .nav-links a {
-  margin-left: 20px;
+/* Contenedor izquierdo: logo + enlaces */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 60px; /* separación amplia entre logo y enlaces y entre enlaces */
+}
+
+/* Logo */
+.logo-link {
+  display: flex;
+  align-items: center;
+}
+.logo-img {
+  height: 70px; /* tamaño del logo */
+  width: auto;
+}
+
+/* Enlaces */
+.nav-item {
+  font-weight: bold;
+  font-size: 1.2em;
   color: var(--color-text-accent);
   text-decoration: none;
+  transition: color 0.2s;
 }
 
-header nav .nav-links a.active,
-header nav .nav-links a:hover {
-  text-decoration: underline;
+.nav-item:hover {
+  color: #076696;
 }
 
 /* ===========================
@@ -236,7 +255,15 @@ header nav .nav-links a:hover {
     height: auto;
     padding: 10px 20px;
   }
-  header nav .nav-links {
-    margin-top: 10px;
+  .nav-left {
+    gap: 30px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .logo-img {
+    height: 50px;
+  }
+  .nav-item {
+    font-size: 1em;
   }
 }
