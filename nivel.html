@@ -6,13 +6,21 @@
 <title>Nivel</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  .nivel-preview {
-    width: 80%;
-    max-width: 800px;
-    margin: 30px auto 20px;
-    position: relative;
-    padding-top: 56.25%; /* relación 16:9 */
-  }
+/* Para nivel.html: contenedor principal ancho */
+#nivel-container {
+  padding: 20px;        /* menos espacio lateral */
+  max-width: 1000px;    /* permitir más ancho */
+  margin: 0 auto;       /* centrar */
+}
+
+/* Ajuste de la preview de video */
+.nivel-preview {
+  width: 100%;          /* ocupa todo el ancho del contenedor */
+  max-width: 800px;     /* opcional */
+  margin: 30px auto 20px;
+  padding-top: 56.25%;  /* 16:9 */
+}
+
   .nivel-preview iframe {
     position: absolute;
     width: 100%;
