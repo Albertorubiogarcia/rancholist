@@ -36,7 +36,8 @@ fetch('niveles.csv')
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    const niveles = lines.map((line, index) => {
+    // 👉 Limitar a los primeros 150 niveles
+    const niveles = lines.slice(0, 150).map((line, index) => {
       const cols = line.split(';');
       return {
         id: index,             // identificador único para nivel.html
@@ -97,3 +98,4 @@ fetch('niveles.csv')
 </script>
 </body>
 </html>
+
