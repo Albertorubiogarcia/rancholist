@@ -159,6 +159,7 @@ fetch('niveles.csv')
 
     const ranking = Object.values(jugadores).sort((a,b) => b.total - a.total);
 
+    // Ranking de jugadores con puntos en gris y tamaño más pequeño
     ranking.forEach((jugador, index) => {
       const divJugador = document.createElement('div');
       divJugador.classList.add('jugador');
@@ -173,18 +174,19 @@ fetch('niveles.csv')
 
       perfilContainer.innerHTML = `<h2>${jugador.nombre} — ${jugador.total.toFixed(2)} pts</h2>`;
 
+      // Ordenar niveles internamente
       jugador.niveles.sort((a,b) => a.globalIndex - b.globalIndex);
 
       // Hardest
       let hardest = jugador.niveles.length ? jugador.niveles[0] : null;
       if(hardest){
         const hardestDiv = document.createElement('div');
-        hardestDiv.style.marginBottom = '15px'; // separación
+        hardestDiv.style.marginBottom = '20px'; // separación clara
         const hHeading = document.createElement('h3');
         hHeading.textContent = "Hardest";
         hHeading.style.fontWeight = "bold";
-        hHeading.style.fontSize = "1.2em";
-        hHeading.style.marginBottom = "5px";
+        hHeading.style.fontSize = "1.3em"; // más grande
+        hHeading.style.marginBottom = "10px";
         hardestDiv.appendChild(hHeading);
 
         const p = document.createElement('p');
@@ -194,7 +196,7 @@ fetch('niveles.csv')
           a.href = hardest.urlVideo;
           a.textContent = hardest.titulo;
           a.target = "_blank";
-          a.style = "font-weight:bold; color:black; text-decoration:none;"; // quitar subrayado
+          a.style = "font-weight:bold; color:black; text-decoration:none;"; // negrita + sin subrayado
           span.appendChild(a);
         } else {
           span.textContent = hardest.titulo;
@@ -211,20 +213,21 @@ fetch('niveles.csv')
 
       const crearSeccion = (nivelesArray, title, estilo) => {
         const section = document.createElement('div');
-        section.style.marginBottom = "15px"; // separación entre secciones
+        section.style.marginBottom = "20px"; // separación clara entre secciones
 
         const heading = document.createElement('h3');
         heading.textContent = title;
         heading.style.fontWeight = "bold";
-        heading.style.fontSize = "1.2em";
-        heading.style.marginBottom = "5px";
+        heading.style.fontSize = "1.2em"; // más grande
+        heading.style.marginBottom = "10px";
         section.appendChild(heading);
 
         const p = document.createElement('p');
 
-        // ordenar niveles por globalIndex
+        // Ordenar niveles
         nivelesArray.sort((a,b) => a.globalIndex - b.globalIndex);
 
+        // Añadir niveles separados por " - " sin números
         nivelesArray.forEach((nivel, i) => {
           const span = document.createElement('span');
           if(nivel.urlVideo){
@@ -248,6 +251,7 @@ fetch('niveles.csv')
         perfilContainer.appendChild(section);
       };
 
+      // Crear secciones siempre, aunque estén vacías
       crearSeccion(mainlist, "Mainlist (1-50)", "font-weight:bold; color:black;");
       crearSeccion(extended, "Extended (51-100)", "color:black;");
       crearSeccion(legacy, "Legacy (101-150)", "color:gray;");
