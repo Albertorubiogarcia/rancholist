@@ -313,3 +313,10 @@ header nav {
   background-repeat: no-repeat;   /* no repite */
   background-attachment: fixed;   /* fondo fijo al scrollear */
 }
+.statsviewer-bg {
+  background-image: url("chickibai.jpg");
+  background-size: 100% 100%;     /* ESTIRA para llenar todo */
+  background-position: center;    /* opcional */
+  background-repeat: no-repeat;   /* no repite */
+  background-attachment: fixed;   /* fondo fijo al scrollear */
+}
