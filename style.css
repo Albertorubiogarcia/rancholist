@@ -308,8 +308,8 @@ header nav {
 }
 .index-bg {
   background-image: url("quique.jpg");
-  background-size: cover;         /* cubre toda la pantalla */
-  background-position: center;    /* centrada */
-  background-repeat: no-repeat;   /* no repetir */
-  background-attachment: fixed;   /* el fondo NO se mueve al scrollear */
+  background-size: 100% 100%;     /* ESTIRA para llenar todo */
+  background-position: center;    /* opcional */
+  background-repeat: no-repeat;   /* no repite */
+  background-attachment: fixed;   /* fondo fijo al scrollear */
 }
