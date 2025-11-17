@@ -273,10 +273,10 @@ header nav {
 .side-img {
   position: fixed;
   top: 120px; /* baja la imagen debajo del menú */
-  width: 180px;
+  width: 400px;
   opacity: 0.8;
   pointer-events: none; /* no bloquea clics en la lista */
-  z-index: 0; 
+  z-index: -1; 
 }
 
 .left-side {
