@@ -275,7 +275,7 @@ header nav {
 =========================== */
 .side-img {
   position: fixed;   /* ❗ TOTALMENTE FIJAS, NO SE MUEVEN */
-  top: 100px;        /* posición vertical inicial */
+  top: 50px;        /* posición vertical inicial */
   width: 400px;
   opacity: 0.9;
   pointer-events: none;
@@ -304,5 +304,5 @@ header nav {
 
 .right-size {
   height: 800px;
-  width: 420px;
+  width: 440px;
 }
