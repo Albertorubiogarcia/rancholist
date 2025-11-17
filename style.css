@@ -276,8 +276,8 @@ header nav {
 .side-img {
   position: fixed;   /* ❗ TOTALMENTE FIJAS, NO SE MUEVEN */
   top: 120px;        /* posición vertical inicial */
-  width: 180px;
-  opacity: 0.75;
+  width: 400px;
+  opacity: 0.9;
   pointer-events: none;
   z-index: -1;       /* fondo por detrás de la lista */
 }
