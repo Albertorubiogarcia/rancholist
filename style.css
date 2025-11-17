@@ -270,13 +270,16 @@ header nav {
 /* ===========================
    Imágenes laterales
 =========================== */
+/* ===========================
+   Imágenes laterales fijas al scroll
+=========================== */
 .side-img {
-  position: fixed;
-  top: 120px; /* baja la imagen debajo del menú */
-  width: 400px;
-  opacity: 0.8;
-  pointer-events: none; /* no bloquea clics en la lista */
-  z-index: -1; 
+  position: fixed;   /* ❗ TOTALMENTE FIJAS, NO SE MUEVEN */
+  top: 120px;        /* posición vertical inicial */
+  width: 180px;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: -1;       /* fondo por detrás de la lista */
 }
 
 .left-side {
@@ -287,8 +290,10 @@ header nav {
   right: 10px;
 }
 
+/* Ocultar en móviles */
 @media (max-width: 1200px) {
   .side-img {
-    display: none; /* se ocultan si la pantalla es pequeña */
+    display: none;
   }
 }
+
