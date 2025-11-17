@@ -65,8 +65,11 @@ fetch('niveles.csv')
       thumb.href = nivel.url;
       thumb.target = "_blank";
       thumb.classList.add('thumb');
-      if(videoId) thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
-      else thumb.style.backgroundColor = '#ccc';
+
+      if(videoId)
+        thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/maxresdefault.jpg')`;
+      else
+        thumb.style.backgroundColor = '#ccc';
 
       // Info del nivel
       const infoDiv = document.createElement('div');
@@ -79,7 +82,7 @@ fetch('niveles.csv')
       linkTitulo.textContent = nivel.titulo; // texto visible
       titulo.appendChild(linkTitulo);
 
-      // Stats debajo del nombre
+      // Stats
       const stats = document.createElement('p');
       stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
 
@@ -99,4 +102,3 @@ fetch('niveles.csv')
 </script>
 </body>
 </html>
-
