@@ -267,3 +267,28 @@ header nav {
     font-size: 1em;
   }
 }
+/* ===========================
+   Imágenes laterales
+=========================== */
+.side-img {
+  position: fixed;
+  top: 120px; /* baja la imagen debajo del menú */
+  width: 180px;
+  opacity: 0.8;
+  pointer-events: none; /* no bloquea clics en la lista */
+  z-index: 0; 
+}
+
+.left-side {
+  left: 10px;
+}
+
+.right-side {
+  right: 10px;
+}
+
+@media (max-width: 1200px) {
+  .side-img {
+    display: none; /* se ocultan si la pantalla es pequeña */
+  }
+}
