@@ -298,11 +298,11 @@ header nav {
 }
 
 .left-size {
-  height: 500px;   /* estirada verticalmente */
-  width: 250px;    /* ancho fijo → puede deformarse */
+  height: 1200px;   /* estirada verticalmente */
+  width: 400px;    /* ancho fijo → puede deformarse */
 }
 
 .right-size {
-  height: 800px;
-  width: 250px;
+  height: 1600px;
+  width: 400px;
 }
