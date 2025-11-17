@@ -146,7 +146,7 @@ header nav {
 /* Miniatura */
 .thumb {
   width: 240px;
-  height: 135px; /* proporción 16:9 */
+  height: 133px; /* proporción 16:9 */
   background-size: cover;
   background-position: center;
   border-radius: 10px;
