@@ -32,12 +32,13 @@
     background-color: #e0f7e0;
   }
 
-  .perfil-container {
+.perfil-container {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    background: #fff;
-  }
+    background: transparent;   /* ahora NO tapa el fondo */
+    transition: background 0.3s ease;
+}
 
   .perfil-container h2 {
     margin-top: 0;
@@ -158,6 +159,7 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
     });
 
     function mostrarPerfil(jugador, divJugador, rank) {
+      perfilContainer.style.background = "white";
       document.querySelectorAll('.ranking .jugador').forEach(d => d.classList.remove('active'));
       divJugador.classList.add('active');
 
