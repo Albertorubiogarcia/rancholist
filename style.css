@@ -146,12 +146,10 @@ header nav {
 /* Miniatura */
 .thumb {
   width: 240px;
-  height: 135px; /* proporción 16:9 */
-  background-size: cover;
-  background-position: center;
+  height: 135px;
   border-radius: 10px;
-  flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;       /* ← NUEVO */
+  background: #000;       /* ← NUEVO, evita barras visuales */
 }
 
 .thumb:hover {
@@ -266,4 +264,10 @@ header nav {
   .nav-item {
     font-size: 1em;
   }
+}
+.thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* Recorta barras negras */
+  display: block;
 }
