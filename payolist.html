@@ -38,11 +38,11 @@ fetch('niveles.csv')
     const lines = csv.trim().split('\n');
     lines.shift(); // quitar cabecera
 
-    // 👉 Limitar a los primeros 150 niveles
+    // 👉 Niveles desde el 151 hasta el final
     const niveles = lines.slice(150).map((line, index) => {
       const cols = line.split(';');
       return {
-        id: index,             // identificador único para nivel.html
+        id: index + 151,      // ID correcto del nivel real
         url: cols[0],
         titulo: cols[1],
         stats: { Creador: cols[2], Ranchopoints: cols[3] }
@@ -53,7 +53,6 @@ fetch('niveles.csv')
       const nivelDiv = document.createElement('div');
       nivelDiv.classList.add('nivel');
 
-      // Obtener ID del video
       let videoId = '';
       try {
         const urlObj = new URL(nivel.url);
@@ -61,7 +60,6 @@ fetch('niveles.csv')
         else if(urlObj.hostname.includes('youtube.com')) videoId = urlObj.searchParams.get('v');
       } catch(e){ console.warn('URL inválida:', nivel.url); }
 
-      // Miniatura clicable (link al vídeo)
       const thumb = document.createElement('a');
       thumb.href = nivel.url;
       thumb.target = "_blank";
@@ -69,18 +67,15 @@ fetch('niveles.csv')
       if(videoId) thumb.style.backgroundImage = `url('https://img.youtube.com/vi/${videoId}/hqdefault.jpg')`;
       else thumb.style.backgroundColor = '#ccc';
 
-      // Info del nivel
       const infoDiv = document.createElement('div');
       infoDiv.classList.add('demon-info');
 
-      // Nombre del nivel → link a nivel.html?id=X
       const titulo = document.createElement('h2');
       const linkTitulo = document.createElement('a');
       linkTitulo.href = `nivel.html?id=${nivel.id}`;
-      linkTitulo.textContent = nivel.titulo; // texto visible
+      linkTitulo.textContent = nivel.titulo;
       titulo.appendChild(linkTitulo);
 
-      // Stats debajo del nombre
       const stats = document.createElement('p');
       stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
 
