@@ -42,7 +42,7 @@ fetch('niveles.csv')
     const niveles = lines.slice(150).map((line, index) => {
       const cols = line.split(';');
       return {
-        id: index + 151,      // ID correcto del nivel real
+        id: index + 150,      // ID correcto del nivel real
         url: cols[0],
         titulo: cols[1],
         stats: { Creador: cols[2], Ranchopoints: cols[3] }
