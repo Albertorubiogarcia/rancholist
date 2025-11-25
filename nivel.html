@@ -102,12 +102,12 @@
         const cols = line.split(';');
         return {
           url: cols[0],
-          titulo: cols[1],
+          titulo: cols[3],
           stats: {
-            Creador: cols[2],
-            Ranchopoints: cols[3]
+            Creador: cols[4],
+            Ranchopoints: cols[5]
           },
-          jugadores: cols[4].split(',').map(j => j.trim()) // separar por comas
+          jugadores: cols[6].split(',').map(j => j.trim()) // separar por comas
         };
       });
 

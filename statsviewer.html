@@ -121,10 +121,10 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
       const cols = line.split(';');
       return {
         url: cols[0],
-        titulo: cols[1],
-        creador: cols[2],
-        ranchopoints: parseFloat(cols[3]) || 0,
-        jugadores: cols[4] ? cols[4].split(',').map(j => j.trim()) : [],
+        titulo: cols[3],
+        creador: cols[4],
+        ranchopoints: parseFloat(cols[5]) || 0,
+        jugadores: cols[6] ? cols[6].split(',').map(j => j.trim()) : [],
         globalIndex: index + 1
       };
     });
