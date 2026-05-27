@@ -122,7 +122,7 @@ fetch('niveles.csv?nocache=' + new Date().getTime())
       return {
         url: cols[0],
         titulo: cols[3],
-        creador: cols[4],
+        verificador: cols[4],
         ranchopoints: parseFloat(cols[5]) || 0,
         jugadores: cols[6] ? cols[6].split(',').map(j => j.trim()) : [],
         globalIndex: index + 1

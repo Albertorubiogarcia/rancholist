@@ -41,7 +41,7 @@
     margin: 0;
     font-size: 2em;
   }
-  .nivel-bar .creador, .nivel-bar .ranchopoints {
+  .nivel-bar .verificador, .nivel-bar .ranchopoints {
     font-size: 1em;
     color: #555;
   }
@@ -104,7 +104,7 @@
           url: cols[0],
           titulo: cols[3],
           stats: {
-            Creador: cols[4],
+            Verificador: cols[4],
             Ranchopoints: cols[5]
           },
           jugadores: cols[6].split(',').map(j => j.trim()) // separar por comas
@@ -138,21 +138,21 @@
       }
       container.appendChild(previewDiv);
 
-      // Barra con nombre, creador y ranchopoints
+      // Barra con nombre, verificador y ranchopoints
       const bar = document.createElement('div');
       bar.classList.add('nivel-bar');
 
       const titulo = document.createElement('h2');
       titulo.textContent = nivel.titulo;
-      const creador = document.createElement('span');
-      creador.classList.add('creador');
-      creador.textContent = `Creador: ${nivel.stats.Creador}`;
+      const verificador = document.createElement('span');
+      verificador.classList.add('verificador');
+      verificador.textContent = `Verificador: ${nivel.stats.Verificador}`;
       const puntos = document.createElement('span');
       puntos.classList.add('ranchopoints');
       puntos.textContent = `Ranchopoints: ${nivel.stats.Ranchopoints}`;
 
       bar.appendChild(titulo);
-      bar.appendChild(creador);
+      bar.appendChild(verificador);
       bar.appendChild(puntos);
 
       container.appendChild(bar);

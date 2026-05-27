@@ -47,7 +47,7 @@ fetch('niveles.csv')
         id: index,             // identificador único para nivel.html
         url: cols[0],
         titulo: cols[3],
-        stats: { Creador: cols[4], Ranchopoints: cols[5] }
+        stats: { Verificador: cols[4], Ranchopoints: cols[5] }
       };
     });
 
@@ -84,7 +84,7 @@ fetch('niveles.csv')
 
       // Stats debajo del nombre
       const stats = document.createElement('p');
-      stats.textContent = `Creador: ${nivel.stats.Creador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
+      stats.textContent = `Verificador: ${nivel.stats.Verificador} | Ranchopoints: ${nivel.stats.Ranchopoints}`;
 
       infoDiv.appendChild(titulo);
       infoDiv.appendChild(stats);
